@@ -1,178 +1,90 @@
-#################################################
-#### Author : Adam Elder
-#### Date   : November 29th 2018
-#### This script is the implementation of the
-#### cross validation based test that would
-#### optimize the l_p norm within the procedure
-#################################################
-#################################################
+#' CV-test runs a cross-validation, parametric bootstrap test. This function returns
+#' an approximate p-value for the specified test statistic.
+#'
+#' @param obs_data The observed data to be used for finding the optimal norm (training),
+#' and finding the test statistic (testing).  Similar to above, each row is an observation and each
+#' column corresponds to either the outcome (first column) or a covariate.
+#' @param pos_lp_norms The index of the norms to be considered.  For example if we use the l_p norm,
+#' norms_indx specifies the different p's to try.
+#' @param num_folds The number of folds to be used in the cross-validation proceedure.  If set to 1,
+#' no cross validation will be used.
+#' @param f_cv_summary How test statistics from different folds are combined to create an overall
+#' test statistic.  Usually the mean is used.
+#' @param n_bs_smp Number of samples to be used in estimating the limiting distribution of the
+#' test statistic under the null.
+#' @param nrm_type The type of norm to be used for the test.  Generally the l_p norm
+#' @param big_train Data is split into splits of roughly equal sizes. The number of splits is equal
+#' to num_folds. If big_train is TRUE then all but one of these splits will be training data,
+#' if big_train is FALSE all but one will be testing data.
+#' @param test_stat_func A function that will provide the test statistic for the
+#' given fold (using the testing data),
+#' and uses the best norm (decided on using the training data).
+#' @param incl_chsn_norm Boolean indicating if chosen norm index should be returned.
+#' @return learned test statistic for a single fold of data
+#'
 #' @export
 
 cv_test <- function(obs_data, pos_lp_norms, num_folds, f_cv_summary = mean,
-                    n_bs_smp, nrm_type = "lp", big_train = TRUE, f_summary,
-                    f_estimate){
-  train_mlt <- (-1) ** (1 + as.integer(big_train))
-  num_obs   <- nrow(obs_data)
-  num_norms <- length(pos_lp_norms)
-  est_cov   <- est_influence_pearson(obs_data)
-  norm_mat  <- matrix(rnorm(n_bs_smp * nrow(est_cov)), nrow = n_bs_smp)
-  e_lm_dstr <- gen_boot_sample(norm_mat, est_cov, center = TRUE, rate = "rootn")
-  cutoff_vals <- rep(NA, num_norms)
-  for(nrm_idx in 1:num_norms){
-    normalized_obs <- apply(e_lm_dstr, 1, l_p_norm,
-                            p = pos_lp_norms[nrm_idx], type = nrm_type)
-    cutoff_vals[nrm_idx] <- quantile(normalized_obs, 0.95)
-  }
-  cv_est_idx <- sample(1:num_obs, replace = FALSE)
-  cv_est_stats <- rep(NA, num_folds)
-  for(fld_idx in 1:num_folds){
-    fld_obs_idx <- c(round(num_obs * (fld_idx - 1)/num_folds) + 1,
-                     round(num_obs * fld_idx/num_folds))
-    training_index <- cv_est_idx[(fld_obs_idx[1] : fld_obs_idx[2]) * train_mlt]
-    cv_est_stats[fld_idx] <- one_fold_est(lm_dst_est = e_lm_dstr, obs_data = obs_data,
-                                          est_func = f_estimate, sum_func = f_summary,
-                                          trn_indx = training_index,
-                                          null_quants = cutoff_vals,
-                                          norms_indx = pos_lp_norms, norm_type = nrm_type)
-  }
-  cv_est <- f_cv_summary(cv_est_stats)
-  sim_ts_mat  <- matrix(rnorm(num_folds * n_bs_smp * nrow(est_cov))/sqrt(num_obs/num_folds),
-                        nrow = num_folds * n_bs_smp)
-  f_e_lm_dstr <- gen_boot_sample(sim_ts_mat, est_cov, center = TRUE, rate = "rootn")
-  mc_draw <- rep(NA, n_bs_smp)
-  for(bs_idx in 1:n_bs_smp){
-    sub_data <- f_e_lm_dstr[(num_folds * (bs_idx - 1) + 1):(num_folds * bs_idx), ,drop = FALSE]
-    sim_cv_est <- rep(NA, num_folds)
-    for(fld_idx in 1:num_folds){
-      training_index <- fld_idx * train_mlt
-      sim_cv_est[fld_idx] <- one_fold_sim(lm_dst_est = e_lm_dstr, sim_ests = sub_data,
-                                          sum_func = f_summary, norm_type = nrm_type,
-                                          trn_indx = training_index, null_quants = cutoff_vals,
-                                          norms_indx = pos_lp_norms)
+                    n_bs_smp, nrm_type = "lp", test_stat_func, f_estimate,
+                    ts_ld_bs_samp = 250, big_train = TRUE, incl_chsn_norm = FALSE,
+                    show_hist = FALSE, test_type = "par_boot", perf_meas = "est_pow"){
+  train_mlt <- (-1) ** (2 + as.integer(big_train))
+  init_cv_est <- est_cv(obs_data = obs_data, est_infl = est_influence_pearson,
+                        pos_lp_norms = pos_lp_norms, nrm_type = nrm_type, est_func = f_estimate,
+                        n_bs_smp = n_bs_smp, test_stat_func = test_stat_func,
+                        f_cv_summary = f_cv_summary, trn_mlt = train_mlt,
+                        num_folds = num_folds, pref_meas = perf_meas,
+                        est_lm_distr =  NULL, return_lmd = TRUE)
+  e_lm_dstr <- init_cv_est$est_lm_dstr
+  t_s_f <- init_cv_est$t_s_f
+  cv_est <- init_cv_est$cv_est
+  est_cov <- init_cv_est$est_co
+  if (test_type == "par_boot"){
+    sim_ts_mat  <- matrix(rnorm(num_folds * ts_ld_bs_samp * nrow(est_cov)),
+                          nrow = num_folds * ts_ld_bs_samp)
+    f_e_lm_dstr <- gen_boot_sample(sim_ts_mat, est_cov, center = TRUE, rate = "rootn")
+    ts_lim_dist <- rep(NA, ts_ld_bs_samp)
+    for(bs_idx in 1:ts_ld_bs_samp){
+      sub_data <- f_e_lm_dstr[(num_folds * (bs_idx - 1) + 1):(num_folds * bs_idx), ,drop = FALSE]
+      par_boot_cv_est <- est_cv(obs_data = sub_data, est_infl = est_influence_pearson,
+                                pos_lp_norms = pos_lp_norms, nrm_type = nrm_type,
+                                n_bs_smp = n_bs_smp, test_stat_func = t_s_f,
+                                f_cv_summary = f_cv_summary,
+                                est_func = function(x)apply(x, 2, mean), pref_meas = perf_meas,
+                                trn_mlt = train_mlt, num_folds = num_folds,
+                                est_lm_distr = e_lm_dstr, return_lmd = FALSE)
+      ts_lim_dist[bs_idx] <- par_boot_cv_est$cv_est
     }
-    mc_draw[bs_idx] <- f_cv_summary(sim_cv_est)
-  }
-  return(mean(as.integer(cv_est <= mc_draw)))
-}
-
-perm_test <- function(obs_data, pos_lp_norms, num_folds, f_cv_summary = mean,
-                      num_perms, nrm_type = "lp", big_train = TRUE, f_summary,
-                      f_estimate, n_bs_smp = 1000, seed = NULL){
-  train_mlt <- (-1) ** (1 + as.integer(big_train))
-  num_obs   <- nrow(obs_data)
-  num_norms <- length(pos_lp_norms)
-  if(is.null(seed)){set.seed(sample(1:1000, 1))}else{set.seed(seed)}
-  ## Initial Estimate
-  est_cov   <- est_influence_pearson(obs_data)
-  norm_mat  <- matrix(rnorm(n_bs_smp * nrow(est_cov)), nrow = n_bs_smp)
-  e_lm_dstr <- gen_boot_sample(norm_mat, est_cov, center = TRUE, rate = "rootn")
-  cutoff_vals <- rep(NA, num_norms)
-  for(nrm_idx in 1:num_norms){
-    normalized_obs <- apply(e_lm_dstr, 1, l_p_norm,
-                            p = pos_lp_norms[nrm_idx], type = nrm_type)
-    cutoff_vals[nrm_idx] <- quantile(normalized_obs, 0.95)
-  }
-  cv_est_idx <- sample(1:num_obs, replace = FALSE)
-  cv_est_stats <- rep(NA, num_folds)
-  for(fld_idx in 1:num_folds){
-    fld_obs_idx <- c(round(num_obs * (fld_idx - 1)/num_folds) + 1,
-                     round(num_obs * fld_idx/num_folds))
-    training_index <- cv_est_idx[(fld_obs_idx[1] : fld_obs_idx[2]) * train_mlt]
-    cv_est_stats[fld_idx] <- one_fold_est(lm_dst_est = e_lm_dstr, obs_data = obs_data,
-                                          est_func = f_estimate, sum_func = f_summary,
-                                          trn_indx = training_index,
-                                          null_quants = cutoff_vals,
-                                          norms_indx = pos_lp_norms, norm_type = nrm_type)
-  }
-  cv_est <- f_cv_summary(cv_est_stats)
-
-  ## Running the permutation tesy
-  perm_results <- rep(NA, num_perms)
-  for(perm_idx in 1:num_perms){
-    y_idx <- sample(1:num_obs, replace = FALSE)
-    perm_data <- obs_data
-    perm_data[, 1] <- perm_data[y_idx, 1]
-    perm_est_idx <- sample(1:num_obs, replace = FALSE)
-    est_perm_cov   <- est_influence_pearson(perm_data)
-    norm_perm_mat  <- matrix(rnorm(n_bs_smp * nrow(est_perm_cov)), nrow = n_bs_smp)
-    e_perm_lm_dstr <- gen_boot_sample(norm_perm_mat, est_perm_cov, center = TRUE, rate = "rootn")
-    cutoff_perm_vals <- rep(NA, num_norms)
-    for(nrm_idx in 1:num_norms){
-      normalized_perm_obs <- apply(e_perm_lm_dstr, 1, l_p_norm,
-                              p = pos_lp_norms[nrm_idx], type = nrm_type)
-      cutoff_perm_vals[nrm_idx] <- quantile(normalized_perm_obs, 0.95)
+  }else if(test_type == "perm"){
+    ts_lim_dist <- rep(NA, ts_ld_bs_samp)
+    num_obs <- nrow(obs_data)
+    for(perm_idx in 1:ts_ld_bs_samp){
+      y_idx <- sample(1:num_obs, replace = FALSE)
+      perm_data <- obs_data
+      perm_data[, 1] <- perm_data[y_idx, 1]
+      perm_cv_est <- est_cv(obs_data = perm_data, est_infl = est_influence_pearson,
+                            pos_lp_norms = pos_lp_norms, nrm_type = nrm_type,
+                            f_cv_summary = f_cv_summary,
+                            est_func = f_estimate, n_bs_smp = n_bs_smp, pref_meas = perf_meas,
+                            test_stat_func = test_stat_func, trn_mlt = train_mlt,
+                            num_folds = num_folds, est_lm_distr = NULL, return_lmd = FALSE)
+      ts_lim_dist[perm_idx] <- perm_cv_est$cv_est
     }
-    perm_est_stats <- rep(NA, num_folds)
-    for(fld_idx in 1:num_folds){
-      fld_obs_idx <- c(round(num_obs * (fld_idx - 1)/num_folds) + 1,
-                       round(num_obs * fld_idx/num_folds))
-      training_index <- cv_est_idx[(fld_obs_idx[1] : fld_obs_idx[2]) * train_mlt]
-      perm_est_stats[fld_idx] <- one_fold_est(lm_dst_est = e_perm_lm_dstr, obs_data = perm_data,
-                                              est_func = f_estimate, sum_func = f_summary,
-                                              trn_indx = training_index,
-                                              null_quants = cutoff_perm_vals,
-                                              norms_indx = pos_lp_norms, norm_type = nrm_type)
-    }
-    perm_results[perm_idx] <- f_cv_summary(perm_est_stats)
-
   }
-  return(mean(perm_results >= cv_est))
-}
-
-l_p_norm <- function(x, p = "max", type = "lp"){
-  if(type == "lp"){
-    if (p == "max") {
-      return(max(abs(x)))
-    } else {
-      l_p <- as.integer(p)
-      return(sum(abs(x)**l_p)**(1 / l_p))
-    }
-  }else if (type == "ordl2"){
-    l_p <- as.integer(p)
-    some_x <- x[order(x)]
-    return(sum(some_x[1:p] **2))
+  if (show_hist){hist(ts_lim_dist);abline(v = cv_est, col = "red");browser()}
+  init_p_val <- mean(as.integer(cv_est <= ts_lim_dist))
+  if(test_stat_func %in% c("mag", "pval")){
+    p_val <- 1 - init_p_val
+  }else{
+    p_val <- init_p_val
+  }
+  if (incl_chsn_norm){
+    chsn_tbl <- vapply(pos_lp_norms, function(x) mean(x == init_cv_est$chsn_norms),
+                       FUN.VALUE = -99)
+    return(c("Estiamted p-value" = p_val,
+             chsn_tbl))
+  }else{
+    return(c("Estimate p-value" = p_val))
   }
 }
-
-
-
-est_influence_pearson <- function(observ){
-  n <- nrow(observ)
-  num_cov <- ncol(observ) - 1
-  means <- colMeans(observ)
-  y_mean <- means[1]
-  cent_obs <- observ - matrix(rep(colMeans(observ), each = n), nrow = n)
-  cent_obs_sqrd <- cent_obs^2
-  sigmas <- colSums(cent_obs_sqrd)/(n - 1)
-  covs <- as.numeric(crossprod(cent_obs[, 1], cent_obs[, -1]))/(n - 1)
-  y_var <- sigmas[1]
-  cent_cov <- cent_obs[, -1] * cent_obs[, 1] - rep(covs, each = n)
-  cent_var <- cent_obs_sqrd - rep(sigmas, each = n)
-  psi_1 <- matrix(rep(sigmas[-1], each = n), nrow = n) *
-    cent_var[, 1] + y_var * cent_var[, -1]
-  ic <- (cent_cov - psi_1 * rep(covs/(y_var * sigmas[-1]), each = n)) *
-    rep((1/sqrt(y_var * sigmas[-1])), each = n)
-  return(ic)
-}
-
-est_pearson <- function(observ){
-  num_var <- ncol(observ)
-  return(cor(observ[, 1], observ[, -1], method = "pearson"))
-}
-
-
-
-
-# for(bb in   1:300){
-#   if(bb %% 10 == 0){cat(bb, " ")}
-#   p_val <- cv_test(mvrnorm(100, mu = rep(0, 5), diag(5)),
-#                    pos_lp_norms = 1:4,
-#                    num_folds = 3, n_bs_smp = 100, nrm_type = "ordl2")
-#   test_res_two[bb] <- p_val
-# }
-
-
-
-
-
 
