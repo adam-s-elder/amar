@@ -8,47 +8,6 @@
 #################################################
 #' @export
 
-
-
-one_fold_est <- function(lm_dst_est, obs_data, est_func, sum_func,
-                         trn_indx, null_quants, norms_indx, norm_type){
-  # num_obs <- nrow(obs_data)
-  trn_data <- obs_data[-trn_indx,]
-  tst_data <- obs_data[ trn_indx,]
-  #cat("train_Rows =", nrow(trn_data), ", ",
-  #   "test_rows =", nrow(tst_data), "\n")
-  if(nrow(trn_data) == 0){trn_data <- obs_data}
-  trn_par_est  <- est_func(trn_data)
-  performs <- pow_for_mag(boot_data = lm_dst_est, dir = trn_par_est,
-                          nrm_type = norm_type, lp = norms_indx,
-                          nf_quant = null_quants)
-  best_norm <- norms_indx[which.max(performs)]
-  if (nrow(tst_data) > 0){
-    tst_par_est <- est_func(tst_data)
-  }else{tst_par_est <- trn_par_est}
-  return(sum_func(tst_par_est, p = best_norm))
-}
-
-one_fold_sim <- function(lm_dst_est, sim_ests, sum_func, norm_type,
-                         trn_indx, null_quants, norms_indx){
-  num_idx <- length(trn_indx)
-  num_sim_ests <- nrow(sim_ests)
-  if(length(trn_indx) == 0 || length(trn_indx) == num_sim_ests){
-    trn_indx <- -1 * 1:num_sim_ests
-    num_idx <- length(trn_indx)}
-  trn_par_est  <- apply(sim_ests[-trn_indx, , drop = FALSE], 2, mean) * sqrt(num_idx)
-  performs <- pow_for_mag(boot_data = lm_dst_est, dir = trn_par_est,
-                          nrm_type = norm_type, lp = norms_indx,
-                          nf_quant = null_quants)
-  best_norm <- norms_indx[which.max(performs)]
-  if (num_idx != num_sim_ests){
-    tst_par_est <- apply(sim_ests[ trn_indx, , drop = FALSE], 2, mean) *
-      sqrt(nrow(sim_ests) - num_idx)
-  }else{tst_par_est <- trn_par_est}
-  return(sum_func(tst_par_est, p = best_norm))
-}
-
-
 cv_test <- function(obs_data, pos_lp_norms, num_folds, f_cv_summary = mean,
                     n_bs_smp, nrm_type = "lp", big_train = TRUE, f_summary,
                     f_estimate){
