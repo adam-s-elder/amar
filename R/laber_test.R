@@ -55,6 +55,53 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
   return(p_val)
 }
 
+ZL <- function(observed_data, ts_sims, ld_sims){
+  cov_mat <- cov(observed_data)
+  margin_vars <- apply(observed_data[, -1], 2, var)
+  x_cor_mat <- diag(1/sqrt(margin_vars)) %*%
+    cov_mat[-1, -1] %*%
+    diag(1/sqrt(margin_vars))
+  psi_hats <- get_test_stat(observed_data)
+  null_lm_distr <- MASS::mvrnorm(n = ts_sims, mu = rep(0, length(psi_hats)),
+                                 Sigma = x_cor_mat)
+  null_trs_dstr <- matrix(NA, nrow = nrow(null_lm_distr), ncol = ncol(null_lm_distr))
+  for(row_idx in 1:nrow(null_lm_distr)){
+    sim_row <- null_lm_distr[row_idx, ] ** 2
+    null_trs_dstr[row_idx, ] <- cumsum(sort(sim_row, decreasing = TRUE))
+  }
+  test_stat <- est_pows(null_trs_dstr, psi_hats)
+  draws <- MASS::mvrnorm(n = ld_sims, mu = rep(0, length(psi_hats)),
+                         Sigma = x_cor_mat)
+  ts_est_dstr <- rep(NA, ld_sims)
+  for(d_idx in 1:ld_sims){
+    draw <- draws[d_idx, ]
+    d_ts <- draw ** 2
+    ts_est_dstr[d_idx] <- est_pows(null_trs_dstr, d_ts)[1]
+  }
+  p_val <- mean(test_stat[1] >= ts_est_dstr)
+  return(p_val)
+}
+
+get_test_stat <- function(obs_data){
+  marg_vars <- apply(obs_data, 2, var)
+  cov_xy    <- apply(obs_data[, -1], 2, function(x) cov(obs_data[, 1], x))
+  var_y <- marg_vars[1]
+  var_x <- marg_vars[-1]
+  betas <- cov_xy/var_x
+  var_ratio <- var_y/var_x
+  t_stats <- sqrt(nrow(obs_data)) * betas / sqrt(var_ratio - betas ** 2)
+  return(t_stats ** 2)
+}
+
+est_pows <- function(tr_lm_dstr, ts_vec){
+  num_opts <- length(ts_vec)
+  ord_ts <- cumsum(sort(ts_vec, decreasing = TRUE))
+  est_p_vals <- rep(NA, num_opts)
+  for(k_idx in 1:num_opts){
+    est_p_vals[k_idx] <- mean(tr_lm_dstr[, k_idx] >= ord_ts[k_idx])
+  }
+  return(c(min(est_p_vals), which.min(est_p_vals)))
+}
 
 bonf_test <- function(obs_data){
   num_cov <- ncol(obs_data)
@@ -67,7 +114,32 @@ bonf_test <- function(obs_data){
 }
 
 
-
+ZL_use_infl <- function(observed_data, ts_sims, ld_sims){
+  cov_mat <- cov(observed_data)
+  margin_vars <- apply(observed_data[, -1], 2, var)
+  x_cor_mat_p <- est_influence_pearson(observed_data)
+  x_cor_mat <- t(x_cor_mat_p) %*% x_cor_mat_p / nrow(observed_data)
+  psi_hats <- get_test_stat(observed_data)
+  null_lm_distr <- MASS::mvrnorm(n = ts_sims, mu = rep(0, length(psi_hats)),
+                                 Sigma = x_cor_mat)
+  null_trs_dstr <- matrix(NA, nrow = nrow(null_lm_distr),
+                          ncol = ncol(null_lm_distr))
+  for(row_idx in 1:nrow(null_lm_distr)){
+    sim_row <- null_lm_distr[row_idx, ] ** 2
+    null_trs_dstr[row_idx, ] <- cumsum(sort(sim_row, decreasing = TRUE))
+  }
+  test_stat <- est_pows(null_trs_dstr, psi_hats)
+  draws <- MASS::mvrnorm(n = ld_sims, mu = rep(0, length(psi_hats)),
+                         Sigma = x_cor_mat)
+  ts_est_dstr <- rep(NA, ld_sims)
+  for(d_idx in 1:ld_sims){
+    draw <- draws[d_idx, ]
+    d_ts <- draw ** 2
+    ts_est_dstr[d_idx] <- est_pows(null_trs_dstr, d_ts)[1]
+  }
+  p_val <- mean(test_stat[1] >= ts_est_dstr)
+  return(p_val)
+}
 
 
 
