@@ -44,10 +44,11 @@ est_influence_pearson <- function(observ, trans = "none"){
 }
 pearson <- list("est_IC" = est_influence_pearson, "est_param" = est_pearson)
 
-est_pearson <- function(observ){
+est_pearson <- function(observ, trans = NULL){
   num_var <- ncol(observ)
   rho <- cor(observ[, 1], observ[, -1], method = "pearson")
-  return(rho ** 2 / (1 - rho ** 2))
+  if(trans == "tsqd"){return(rho ** 2 / (1 - rho ** 2))}
+  else(return(rho))
 }
 
 
