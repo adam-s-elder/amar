@@ -16,43 +16,36 @@
 
 abs_max <- function(x) max(abs(x))
 
-mag_for_pow <- function(boot_data, dir, lp = 2, power = 0.8, nf_quant){
+mag_for_pow <- function(boot_data, dir, lp_nrms = 2, power = 0.8, nf_quants, nrm_type = "lp"){
   n_covs <- ncol(boot_data)
   n_obs  <- nrow(boot_data)
-  n_dir <- dir/(sqrt(sum(dir ** 2)))
   roots <- rep(NA, n_obs)
-  if(lp == "max"){
-    prd_vals <- sweep(boot_data, 2, n_dir, FUN = "*")
-    maxes <- apply(prd_vals, 1, abs_max)
-    smallish <- quantile(maxes, 1 - power)
-    return(nf_quant/smallish)
-  }else{
-    lp <- as.numeric(lp)
-  }
-  poly <- rep(NA, lp + 1)
-  dir_mat <- matrix(NA, nrow = lp + 1, ncol = n_covs)
-  dir_mat[1, ] <- rep(1, n_covs)
-  for(i in 2:(lp + 1)){
-    dir_mat[i, ] <- dir_mat[i - 1, ] * n_dir
-  }
-  for(root_idx in 1:n_obs){
-    obs <- boot_data[root_idx, ]
-    for(k_idx in 0:lp){
-      poly[k_idx + 1] <- choose(lp, k_idx) * sum(dir_mat[k_idx + 1, ] * (obs ** (lp - k_idx)))
+  n_norms <- length(lp_nrms)
+  norm_res <- rep(NA, n_norms)
+  for(norm_idx in 1:n_norms){
+    lp <- lp_nrms[norm_idx]
+    nf_quant <- nf_quants[norm_idx]
+    if(lp == "max"){
+      many_mags <- rep(NA, n_obs)
+      for(obs_idx in 1:n_obs){
+        xs <- boot_data[obs_idx]
+        all_opts <- pmax((nf_quant - xs) / dir, (-nf_quant - xs )/ dir)
+        many_mags[obs_idx] <- min(pmax(0, all_opts))
+      }
+      mfp <- quantile(many_mags, power)
+      norm_res[norm_idx] <- mfp
+    }else{
+      lp <- as.numeric(lp)
+      for(root_idx in 1:n_obs){
+        sing_obs <- boot_data[root_idx, ]
+        roots[root_idx] <- find_mag(one_obs = sing_obs, dir = dir, cutoff = nf_quant,
+                                    nrm_idx = lp, nrm_type = nrm_type)
+      }
+      norm_res[norm_idx] <- quantile(roots, power)
     }
-    poly[1] <- poly[1] - nf_quant ** lp
-     all_rts <- polyroot(poly)
-    # print(min(abs(Im(all_rts))))
-     pos_root <- which(Re(all_rts) > 0)
-     apr <- all_rts[pos_root]
-     real_root <- which(abs(Im(apr)) < 0.00001)
-     if(length(real_root) != 1){
-       roots[root_idx] <- -1
-     }else{
-       roots[root_idx] <- Re(apr[real_root])
-     }
   }
-  return(quantile(roots, power))
+  names(norm_res) <- lp_nrms
+  return(norm_res)
 }
 
 

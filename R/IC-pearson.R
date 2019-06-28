@@ -17,7 +17,7 @@
 #### variable of interest (the variable for which pearson correlation is
 #### calculated.
 
-est_influence_pearson <- function(observ){
+est_influence_pearson <- function(observ, trans = "none"){
   n <- nrow(observ)
   num_cov <- ncol(observ) - 1
   means <- colMeans(observ)
@@ -33,17 +33,22 @@ est_influence_pearson <- function(observ){
     cent_var[, 1] + y_var * cent_var[, -1]
   ic <- (cent_cov - psi_1 * rep(covs/(y_var * sigmas[-1]), each = n)) *
     rep((1/sqrt(y_var * sigmas[-1])), each = n)
-  return(ic)
+  if(trans == "none"){
+    return(ic)
+  }else if(trans == "tsqd"){
+    num_var <- ncol(observ)
+    rho <- cor(observ[, 1], observ[, -1], method = "pearson")[1, ]
+    mat_mult <- diag(2 * rho / (1 - rho ** 2) ** 2)
+    return(ic  %*% t(mat_mult))
+  }
 }
+pearson <- list("est_IC" = est_influence_pearson, "est_param" = est_pearson)
 
 est_pearson <- function(observ){
   num_var <- ncol(observ)
-  return(cor(observ[, 1], observ[, -1], method = "pearson"))
+  rho <- cor(observ[, 1], observ[, -1], method = "pearson")
+  return(rho ** 2 / (1 - rho ** 2))
 }
-
-
-pearson <- list("est_IC" = est_influence_pearson, "est_param" = est_pearson)
-
 
 
 

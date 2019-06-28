@@ -12,7 +12,8 @@ l_p_norm <- function(x, p = "max", type = "lp"){
     }
   }else if (type == "ordl2"){
     l_p <- as.integer(p)
-    some_x <- x[order(abs(x)), decreasing = TRUE]
-    return(sum(some_x[1:p] **2))
+    x2 <- x ** 2
+    some_x <- sort(x2, decreasing = TRUE)
+    return(sum(some_x[1:p]))
   }
 }

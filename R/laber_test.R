@@ -56,6 +56,17 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
 }
 
 
+bonf_test <- function(obs_data){
+  num_cov <- ncol(obs_data)
+  pvals <- rep(NA, num_cov - 1)
+  for(cov_idx in 2:num_cov){
+    cov_lm <- lm(obs_data[, 1] ~ obs_data[, cov_idx])
+    pvals[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 4]
+  }
+  return(pvals)
+}
+
+
 
 
 
