@@ -17,19 +17,21 @@
 #' to num_folds. If big_train is TRUE then all but one of these splits will be training data,
 #' if big_train is FALSE all but one will be testing data.
 #' @param test_stat_func A function that will provide the test statistic for the
-#' given fold (using the testing data),
-#' and uses the best norm (decided on using the training data).
+#' given fold (using the testing data), and uses the best 
+#' norm (decided on using the training data).
 #' @param incl_chsn_norm Boolean indicating if chosen norm index should be returned.
 #' @return learned test statistic for a single fold of data
 #'
 #' @export
 
-cv_test <- function(obs_data, pos_lp_norms, num_folds, f_cv_summary = mean,
+cv_test <- function(obs_data, param, pos_lp_norms, num_folds, f_cv_summary = mean, 
                     n_bs_smp, nrm_type = "lp", test_stat_func, f_estimate,
                     ts_ld_bs_samp = 250, big_train = TRUE, incl_chsn_norm = FALSE,
                     show_hist = FALSE, test_type = "par_boot", perf_meas = "est_pow"){
   train_mlt <- (-1) ** (2 + as.integer(big_train))
-  init_cv_est <- est_cv(obs_data = obs_data, est_infl = est_influence_pearson,
+  est_infl_func <- get_infl[[param]]$est_IC
+  est_parm_func <- get_infl[[param]]$est_param
+  init_cv_est <- est_cv(obs_data = obs_data, est_infl = est_infl_func,
                         pos_lp_norms = pos_lp_norms, nrm_type = nrm_type, est_func = f_estimate,
                         n_bs_smp = n_bs_smp, test_stat_func = test_stat_func,
                         f_cv_summary = f_cv_summary, trn_mlt = train_mlt,
@@ -46,7 +48,7 @@ cv_test <- function(obs_data, pos_lp_norms, num_folds, f_cv_summary = mean,
     ts_lim_dist <- rep(NA, ts_ld_bs_samp)
     for(bs_idx in 1:ts_ld_bs_samp){
       sub_data <- f_e_lm_dstr[(num_folds * (bs_idx - 1) + 1):(num_folds * bs_idx), ,drop = FALSE]
-      par_boot_cv_est <- est_cv(obs_data = sub_data, est_infl = est_influence_pearson,
+      par_boot_cv_est <- est_cv(obs_data = sub_data, est_infl = est_infl_func,
                                 pos_lp_norms = pos_lp_norms, nrm_type = nrm_type,
                                 n_bs_smp = n_bs_smp, test_stat_func = t_s_f,
                                 f_cv_summary = f_cv_summary,
@@ -62,7 +64,7 @@ cv_test <- function(obs_data, pos_lp_norms, num_folds, f_cv_summary = mean,
       y_idx <- sample(1:num_obs, replace = FALSE)
       perm_data <- obs_data
       perm_data[, 1] <- perm_data[y_idx, 1]
-      perm_cv_est <- est_cv(obs_data = perm_data, est_infl = est_influence_pearson,
+      perm_cv_est <- est_cv(obs_data = perm_data, est_infl = est_infl_func,
                             pos_lp_norms = pos_lp_norms, nrm_type = nrm_type,
                             f_cv_summary = f_cv_summary,
                             est_func = f_estimate, n_bs_smp = n_bs_smp, pref_meas = perf_meas,
