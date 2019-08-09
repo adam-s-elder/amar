@@ -1,7 +1,17 @@
+#' Calculate the estimated p-value for a given observed alternative
+#' and a given norm
+#' @param boot_data the simulated data draw from
+#' the limiting distribution under the null
+#' @param dir the observed estimate of the parameter
+#' @param lp the index for the norm used
+#' @param nrm_typ the type of norm used
+#'
+#' @export
+
 pval_for_mag <- function(boot_data, dir, lp = 2, nrm_type = "lp"){
   num_norms <- length(lp)
   est_pvals <- rep(NA, num_norms)
-  
+
   distr <- matrix(NA, nrow = nrow(boot_data), ncol = num_norms)
   if(nrm_type == "ordl2"){
     num_obs <- nrow(boot_data)

@@ -4,7 +4,14 @@
 \alias{l_p_norm}
 \title{A function used to calculate various L_p norms}
 \usage{
-l_p_norm(x, p = "max")
+l_p_norm(x, p = "max", type = "lp")
+}
+\arguments{
+\item{x}{Observed data}
+
+\item{p}{index of the norm}
+
+\item{type}{Kind of norm used}
 }
 \description{
 A function used to calculate various L_p norms

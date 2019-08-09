@@ -1,4 +1,7 @@
 #' A function used to calculate various L_p norms
+#' @param x Observed data
+#' @param p index of the norm
+#' @param type Kind of norm used
 #'
 #' @export
 

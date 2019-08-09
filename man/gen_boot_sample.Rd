@@ -5,7 +5,7 @@
 \title{Generate a multiplier bootstrap sample}
 \usage{
 gen_boot_sample(epsilon_mat, obs_ic, center = TRUE, param_est = 0,
-  rate = "rootn")
+  rate = "n")
 }
 \arguments{
 \item{obs_ic}{The empirical estimate of the influence curve to be used in the multiplier bootstrap.}

@@ -14,9 +14,9 @@
 #'
 #' @export
 
-abs_max <- function(x) max(abs(x))
 
 mag_for_pow <- function(boot_data, dir, lp_nrms = 2, power = 0.8, nf_quants, nrm_type = "lp"){
+  abs_max <- function(x) max(abs(x))
   n_covs <- ncol(boot_data)
   n_obs  <- nrow(boot_data)
   roots <- rep(NA, n_obs)
@@ -47,20 +47,6 @@ mag_for_pow <- function(boot_data, dir, lp_nrms = 2, power = 0.8, nf_quants, nrm
   names(norm_res) <- lp_nrms
   return(norm_res)
 }
-
-
-# xx <- seq(from = -3, to = 3, length.out = 1000)
-# yy <- rep(NA, 1000)
-# zz <- rep(NA, 1000)
-# for(bbs in 1:1000) {
-#   yy[bbs] <- (sum(poly * (xx[bbs] ** c(0:lp)))) ** (1/lp)
-#   zz[bbs] <- l_p_norm(obs + xx[bbs] * n_dir, p = lp)
-# }
-# plot(xx, yy, type = "l", ylim = c(0, max(yy)))
-# abline(h = nf_quant, col = "red")
-# plot(xx, zz, type = "l", ylim = c(0, max(zz)))
-# abline(h = nf_quant, col = "red")
-# browser()
 
 
 

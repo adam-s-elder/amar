@@ -1,21 +1,22 @@
 ######################################################################
-#### Estimating Influence Curve and parameter for various parameters. 
+#### Estimating Influence Curve and parameter for various parameters.
 #### Adam Elder
 #### This script will contain all of the various proceedures
 #### used for estimating both the parameter, and the influence
-#### curves used for estimating spearman correlation, 
+#### curves used for estimating spearman correlation,
 #### pearson correlation and mean.
 #### These functions will be given an entire dataset, and will
 #### return the estimate for the parameter, and for each
 #### estimated influence curve at each observation.
 ######################################################################
 
-#### The following function will take a set of observations, and return the
-#### estimated covariance matrix for the estimates of the pearson correlation.
-#### Estimates of the covariance are generated using the empirical influence
-#### function.  The first column of your data should correspond to the
-#### variable of interest (the variable for which pearson correlation is
-#### calculated.
+#' The following function will take a set of observations, and return the
+# estimated covariance matrix for the estimates of the pearson correlation.
+# Estimates of the covariance are generated using the empirical influence
+# function.  The first column of your data should correspond to the
+#' variable of interest (the variable for which pearson correlation is
+#' calculated.
+#' @export
 
 est_influence_pearson <- function(observ, trans = "none"){
   n <- nrow(observ)
@@ -43,7 +44,7 @@ est_influence_pearson <- function(observ, trans = "none"){
   }
 }
 
-est_pearson <- function(observ, trans = NULL){
+est_pearson <- function(observ, trans = "none"){
     num_var <- ncol(observ)
     rho <- cor(observ[, 1], observ[, -1], method = "pearson")
     if(trans == "tsqd"){
@@ -112,7 +113,6 @@ mean_f <- list("est_IC" = est_influence_mean, "est_param" = est_mean)
 #### Placing all of the different influence function and parameter estimation
 #### inside of a single function
 
-est_infl_funcs <- list("spearman" = spearman, "pearson" = pearson,
-                       "mean" = mean_f)
-
+get_infl <- list("spearman" = spearman, "pearson" = pearson,
+                 "mean" = mean_f)
 

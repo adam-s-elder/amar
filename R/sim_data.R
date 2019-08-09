@@ -1,12 +1,5 @@
-##################################################
-#### Generating observations
-####
-#### This script is used to create observations
-#### from various multivariate distributions
-#### to test our method.
-####
-#### Author : Adam Elder
-##################################################
+#' Functions for creating data
+#' @export
 
 gen_exp_cop <- function(n, d, cov){
   rate_params <- c(0.5, 1, 2)
@@ -18,9 +11,11 @@ gen_exp_cop <- function(n, d, cov){
   return(cop_data)
 }
 
+#' @export
 gen_norm <- function(n, d, cov) {MASS::mvrnorm(n = n, mu = rep(0, d), Sigma = cov)}
 
 
+#' @export
 gen_one_samp_mi <- function(base, xycor, xxcor, num_cor, num_uncor){
   zv <- rpois(1, base)
   cr_x <- rpois(num_cor, base)
@@ -41,6 +36,7 @@ gen_one_samp_mi <- function(base, xycor, xxcor, num_cor, num_uncor){
   return(c(zv, cr_x, uncr_x))
 }
 
+#' @export
 gen_one_samp_md <- function(base, xycor, xxcor, num_cor, num_uncor){
   uncr_x <- rpois(num_uncor, base)
   xx_lam <- base * xxcor/(1 - xxcor)
@@ -61,6 +57,7 @@ gen_one_samp_md <- function(base, xycor, xxcor, num_cor, num_uncor){
   return(c(zv, cr_x, uncr_x))
 }
 
+#' @export
 gen_pois_samp <- function(ss, base, xycor, xxcor, num_cor, num_uncor, marg_indep = TRUE){
   all_obs <- matrix(NA, nrow = ss, ncol = num_cor + num_uncor + 1)
   if (marg_indep){
@@ -76,6 +73,7 @@ gen_pois_samp <- function(ss, base, xycor, xxcor, num_cor, num_uncor, marg_indep
   }
 }
 
+#' @export
 make_data <- function(ss, dim, rho, model = 1, b = NULL){
   x_cov <- matrix(rho, nrow = dim, ncol = dim)
   diag(x_cov) <- 1

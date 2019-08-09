@@ -6,7 +6,7 @@
 is used to estimate the power of a
 certain direction given the magnitude of that direction.}
 \usage{
-pow_for_mag(boot_data, dir, lp = 2, mag = 1, nf_quant)
+pow_for_mag(boot_data, dir, lp = 2, nf_quants, nrm_type = "lp")
 }
 \arguments{
 \item{boot_data}{bootstrap estimates of the (centered) limiting distribution.
@@ -14,9 +14,11 @@ Data where columns correspond to different covariates, and rows are independent 
 
 \item{dir}{a vector in the direction for which we wish to estimate power.}
 
-\item{lp}{the lp norm to be used (ideally it is an integer)}
+\item{lp}{the lp norms to be used (ideally integers).}
 
-\item{mag}{length of the local alternative vector.}
+\item{nf_quant}{the cutoff values for the distribution under the null and each lp norm.}
+
+\item{nrms_type}{}
 }
 \value{
 Magnitude for the specified lp norm for a given local alternative.

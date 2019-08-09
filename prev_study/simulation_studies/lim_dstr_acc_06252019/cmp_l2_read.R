@@ -1,13 +1,13 @@
 #############################
 #### read sims
-#### december 6th 2018  
+#### december 6th 2018
 #### author : adam elder
 #############################
 
 library(tidyverse)
 library(kableExtra)
 
-sim_mat <- expand.grid("samp_size" = c(100), 
+sim_mat <- expand.grid("samp_size" = c(100),
                        "marg_indp" = c(TRUE),
                        "prop_x_cor" = c(0, 0.0001, 0.6),
                        "xy_cor" = c(0.1, 0.5), "dim" = c(10, 50),
@@ -19,19 +19,19 @@ sim_mat <- expand.grid("samp_size" = c(100),
 res_name <- function(n, marg_indp, norm_type, prop_cor, dist_acc,
                      proc_type, xy_cor, dim, res_fold = "res"){
   if(prop_cor == 0.0001){prop_cor <- "1e-04"}
-  paste0("res/sims_n_samp_", n, "_mar_indep_", marg_indp, 
-         "_norm_type_", norm_type, "_prop_cor_", prop_cor, 
-         "_dist_acc_", dist_acc, "_meas_", proc_type, 
+  paste0("res/sims_n_samp_", n, "_mar_indep_", marg_indp,
+         "_norm_type_", norm_type, "_prop_cor_", prop_cor,
+         "_dist_acc_", dist_acc, "_meas_", proc_type,
          "_xy_cor_", xy_cor, "_dim_", dim,"_tsq_", ".csv")
 }
 
 one_sim <- function(n, marg_indp, norm_type, prop_cor, dist_acc, proc_type, xy_cor, dim, res_fold = "res"){
-  res_name <- res_name(n, marg_indp, norm_type, prop_cor, dist_acc, 
+  res_name <- res_name(n, marg_indp, norm_type, prop_cor, dist_acc,
                        proc_type, xy_cor, dim, res_fold = res_fold)
   if(file.exists(res_name)){
     result <- read.csv(res_name)
     num_cols <- ncol(result)
-    return(round(c(as.numeric(mean(result[, 2] <= 0.05)), 
+    return(round(c(as.numeric(mean(result[, 2] <= 0.05)),
                    mean(result[, num_cols])), 3))
   }else{
     return(NA)
@@ -95,7 +95,7 @@ make_kable_table <- function(data_table, form_table){
   for(col_idx in 1:n_cols){
     temp_col <- kableExtra::cell_spec(data_table[, col_idx], "latex",bold = TRUE,
                                       color = factor(form_table[, col_idx],
-                                                     c(0, 1, 2), 
+                                                     c(0, 1, 2),
                                                      c("black", "white", "red")),
                                       background = ifelse(form_table[, col_idx] == 0,
                                                           "white", "black"))
@@ -121,7 +121,7 @@ get_form_table <- function(dat_table, tol_lev){
     }
     form_table[row_idx, ] <- row_vals
   }
-  return(form_table) 
+  return(form_table)
 }
 
 color_tbl <- function(table, cutoff){
@@ -142,10 +142,15 @@ make_table <- function(res_tbl, grp_vars, grp_var_add, splt1, splt2, val, sg_df 
   for(s2_idx in 1:n_s2_vars){
     sub_df <- n_res_tbl[n_res_tbl[, splt2] == splt_2_vals[s2_idx], c(grp_vars, splt1, val)]
     s_sub_df <- spread(sub_df, key = splt1, value = val, drop = FALSE)
+    exl_cols <- which(colnames(s_sub_df) %in% grp_vars)
+    splt_1_vals <- colnames(s_sub_df[, -exl_cols])
     s_sub_df <- good_sort(s_sub_df, grp_vars)
     s_sub_df <- rename_col_vals(s_sub_df, grp_vars, grp_var_add)
-    exl_cols <- which(colnames(s_sub_df) %in% grp_vars)
-    mis_idx[, s2_idx] <- apply(s_sub_df[, -exl_cols], 1, function(x) all(is.na(x)))
+    s_mis_idx <- apply(s_sub_df[, -exl_cols], 1, function(x) all(is.na(x)))
+    if(nrow(mis_idx) != length(s_mis_idx)){
+      mis_idx <- matrix(NA, nrow = length(s_mis_idx), ncol = n_s2_vars)
+    }
+    mis_idx[, s2_idx] <- s_mis_idx
     mat_s <- round(as.matrix(s_sub_df[, -exl_cols]), nd)
     s_sub_df[, -exl_cols] <- color_tbl(mat_s, sg_df)
     split_dfs[[as.character(splt_2_vals[s2_idx])]] <- s_sub_df
@@ -163,7 +168,7 @@ make_table <- function(res_tbl, grp_vars, grp_var_add, splt1, splt2, val, sg_df 
   colnames(fin_fin_df) <- NULL
   knitr::kable(fin_fin_df, format = "latex", align = "c", #longtable = TRUE,
                booktabs = TRUE, escape = FALSE, linesep = "", row.names = FALSE) %>%
-    kable_styling(latex_options = "scale_down") %>% 
+    kable_styling(latex_options = "scale_down") %>%
     # row_group_label_position = "stack"
     collapse_rows(columns = c(1:n_grp_vars)) %>%
     add_header_above(c(" "  = n_grp_vars, rep(spl_1, n_s2_vars))) %>%
@@ -178,15 +183,15 @@ bonf_table <- expand.grid("samp_size" = c(100),  "marg_indp" = c(TRUE),
                           "xy_cor" = c(0.1, 0.5), "dim" = c(10, 50),
                           "dist_acc" = c(250, 500, 750),
                           "nrm_typ" = c("bonf"), "proc_type" = c(0), "1" = 1)
-  
+
   expand.grid("samp_size" = c(100),  "marg_indp" = c(TRUE, FALSE),
-                          "prop_x_cor" = c(0, 0.0001, 0.1, 0.2), 
+                          "prop_x_cor" = c(0, 0.0001, 0.1, 0.2),
                           "xy_cor" = c(0.1, 0.3, 0.5), "dim" = c(10, 50, 100),
                           "dist_acc" = c(250, 500, 750),
                           "nrm_typ" = c("bonf"), "proc_type" = c(0), '1' = 1)
 
 for(bon_idx in 1:nrow(bonf_table)){
-  sub_idx <- which(apply(initial_table[, 1:6], 1, 
+  sub_idx <- which(apply(initial_table[, 1:6], 1,
                          function(x) all(x == bonf_table[bon_idx, 1:6])))
   sub_res <- initial_table[sub_idx,]
   bonf_table[bon_idx, "1"] <- mean(sub_res[, "2"], na.rm = TRUE)
@@ -200,13 +205,13 @@ mar_ind_tb <- subset(final_table, marg_indp == TRUE)
 mar_dep_tb <- subset(final_table, marg_indp == FALSE)
 
 make_table(res_tbl = mar_ind_tb, grp_vars = c("prop_x_cor", "xy_cor", "dim"),
-           splt1 = "dist_acc", splt2 = "nrm_typ", 
-           grp_var_add = c("Prop of X cor = ", "X Y Correlation = ", ""), 
+           splt1 = "dist_acc", splt2 = "nrm_typ",
+           grp_var_add = c("Prop of X cor = ", "X Y Correlation = ", ""),
            val = "val")
 
 make_table(res_tbl = mar_dep_tb, grp_vars = c("prop_x_cor", "xy_cor", "dim"),
-           splt1 = "nrm_typ", splt2 = "xx_cor", 
-           grp_var_add = c("Prop of X cor = ", "X Y Correlation = ", ""), 
+           splt1 = "nrm_typ", splt2 = "xx_cor",
+           grp_var_add = c("Prop of X cor = ", "X Y Correlation = ", ""),
            val = "val")
 
 

@@ -1,3 +1,31 @@
+#' This is an intermediate function inbetween the cv_test and one_fold_est functions which
+#' allows for specification of the measure of performance.
+#'
+#' @param obs_data The observed data to be used for finding the optimal norm (training),
+#' and finding the test statistic (testing).  Similar to above, each row is an observation and each
+#' column corresponds to either the outcome (first column) or a covariate.
+#' @param est_infl Estimate of the influence function, if one exists.
+#' @param pos_lp_norms The index of the norms to be considered.  For example if we use the l_p norm,
+#' norms_indx specifies the different p's to try.
+#' @param num_folds The number of folds to be used in the cross-validation proceedure.  If set to 1,
+#' no cross validation will be used.
+#' @param f_cv_summary How test statistics from different folds are combined to create an overall
+#' test statistic.  Usually the mean is used.
+#' @param n_bs_smp Number of samples to be used in estimating the limiting distribution of the
+#' test statistic under the null.
+#' @param nrm_type The type of norm to be used for the test.  Generally the l_p norm.
+#' @param big_train Data is split into splits of roughly equal sizes. The number of splits is equal
+#' to num_folds. If big_train is TRUE then all but one of these splits will be training data,
+#' if big_train is FALSE all but one will be testing data.
+#' @param num_folds The number of folds desired for the cross-validated parameter estimate (usually 1).
+#' @param test_stat_func A function that will provide the test statistic for the
+#' given fold (using the testing data), and uses the best
+#' norm (decided on using the training data).
+#' @param incl_chsn_norm Boolean indicating if chosen norm index should be returned.
+#' @return learned test statistic for a single fold of data
+#'
+#' @export
+
 est_cv <- function(obs_data, est_infl, pos_lp_norms, nrm_type, est_func,
                    n_bs_smp, test_stat_func, trn_mlt, num_folds, pref_meas,
                    f_cv_summary = mean, est_lm_distr = NULL, return_lmd = FALSE){

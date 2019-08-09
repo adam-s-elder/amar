@@ -17,20 +17,20 @@
 #' to num_folds. If big_train is TRUE then all but one of these splits will be training data,
 #' if big_train is FALSE all but one will be testing data.
 #' @param test_stat_func A function that will provide the test statistic for the
-#' given fold (using the testing data), and uses the best 
+#' given fold (using the testing data), and uses the best
 #' norm (decided on using the training data).
 #' @param incl_chsn_norm Boolean indicating if chosen norm index should be returned.
 #' @return learned test statistic for a single fold of data
 #'
 #' @export
 
-cv_test <- function(obs_data, param, pos_lp_norms, num_folds, f_cv_summary = mean, 
-                    n_bs_smp, nrm_type = "lp", test_stat_func, f_estimate,
+cv_test <- function(obs_data, param, pos_lp_norms, num_folds, f_cv_summary = mean,
+                    n_bs_smp, nrm_type = "lp", test_stat_func,
                     ts_ld_bs_samp = 250, big_train = TRUE, incl_chsn_norm = FALSE,
                     show_hist = FALSE, test_type = "par_boot", perf_meas = "est_pow"){
   train_mlt <- (-1) ** (2 + as.integer(big_train))
   est_infl_func <- get_infl[[param]]$est_IC
-  est_parm_func <- get_infl[[param]]$est_param
+  est_parm_fun <- f_estimate <- get_infl[[param]]$est_param
   init_cv_est <- est_cv(obs_data = obs_data, est_infl = est_infl_func,
                         pos_lp_norms = pos_lp_norms, nrm_type = nrm_type, est_func = f_estimate,
                         n_bs_smp = n_bs_smp, test_stat_func = test_stat_func,

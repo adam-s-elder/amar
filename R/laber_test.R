@@ -55,6 +55,7 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
   return(p_val)
 }
 
+#' @export
 ZL <- function(observed_data, ts_sims, ld_sims){
   cov_mat <- cov(observed_data)
   margin_vars <- apply(observed_data[, -1], 2, var)
@@ -82,6 +83,7 @@ ZL <- function(observed_data, ts_sims, ld_sims){
   return(p_val)
 }
 
+#' @export
 get_test_stat <- function(obs_data){
   marg_vars <- apply(obs_data, 2, var)
   cov_xy    <- apply(obs_data[, -1], 2, function(x) cov(obs_data[, 1], x))
@@ -93,6 +95,7 @@ get_test_stat <- function(obs_data){
   return(t_stats ** 2)
 }
 
+#' @export
 est_pows <- function(tr_lm_dstr, ts_vec){
   num_opts <- length(ts_vec)
   ord_ts <- cumsum(sort(ts_vec, decreasing = TRUE))
@@ -103,17 +106,27 @@ est_pows <- function(tr_lm_dstr, ts_vec){
   return(c(min(est_p_vals), which.min(est_p_vals)))
 }
 
-bonf_test <- function(obs_data){
-  num_cov <- ncol(obs_data)
-  pvals <- rep(NA, num_cov - 1)
-  for(cov_idx in 2:num_cov){
-    cov_lm <- lm(obs_data[, 1] ~ obs_data[, cov_idx])
-    pvals[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 4]
+#' @export
+bonf_test <- function(obs_data, test_type = "pearson"){
+  if(test_type == "pearson"){
+    num_cov <- ncol(obs_data)
+    pvals <- rep(NA, num_cov - 1)
+    for(cov_idx in 2:num_cov){
+      cov_lm <- lm(obs_data[, 1] ~ obs_data[, cov_idx])
+      pvals[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 4]
+    }
+  }ifelse(test_type == "mean"){
+    num_cov <- ncol(obs_data)
+    pvals <- rep(NA, num_cov)
+    for(cov_idx in 1:num_cov){
+      pvals[cov_idx] <- t.test(obs_data[, cov_idx])$p.value
+    }
   }
   return(pvals)
 }
 
 
+#' @export
 ZL_use_infl <- function(observed_data, ts_sims, ld_sims){
   cov_mat <- cov(observed_data)
   margin_vars <- apply(observed_data[, -1], 2, var)
