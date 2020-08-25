@@ -15,7 +15,7 @@ the limiting distribution under the null}
 
 \item{lp}{the index for the norm used}
 
-\item{nrm_typ}{the type of norm used}
+\item{nrm_type}{the type of norm used}
 }
 \description{
 Calculate the estimated p-value for a given observed alternative

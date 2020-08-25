@@ -6,8 +6,8 @@
 #' Data where columns correspond to different covariates, and rows are independent observations.
 #' @param lp the lp norms to be used (ideally integers).
 #' @param dir a vector in the direction for which we wish to estimate power.
-#' @param nf_quant the cutoff values for the distribution under the null and each lp norm.
-#' @param nrms_type
+#' @param nf_quants the cutoff values for the distribution under the null and each lp norm.
+#' @param nrm_type the class of norms to select over.
 #'
 #' @return Magnitude for the specified lp norm for a given local alternative.
 #'

@@ -6,8 +6,15 @@
 either an apriori chosen l_p norm, or choosing
 the norm adaptively}
 \usage{
-cel_test(obs_data, lp_norm = "ap", as_meas, num_boot = 1000,
-  pos_lp = c(2, "max"), fixed = "power", cmp_meas = "mean")
+cel_test(
+  obs_data,
+  lp_norm = "ap",
+  as_meas,
+  num_boot = 1000,
+  pos_lp = c(2, "max"),
+  fixed = "power",
+  cmp_meas = "mean"
+)
 }
 \arguments{
 \item{obs_data}{the observed data, with columns representing covariates and
@@ -19,6 +26,8 @@ l_p norm.}
 \item{as_meas}{the association measure to be used.}
 
 \item{num_boot}{number of bootstrap samples used to approximate the limiting distribution}
+
+\item{pos_lp}{the possible norms to be selected from.}
 
 \item{fixed}{the parameter (either power or magnitude) to be held constant in the
 l_p norm selection proceedure.}

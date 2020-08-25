@@ -6,8 +6,14 @@
 is used to estimate the magnitude needed for a
 certain direction to achive a given power.}
 \usage{
-mag_for_pow(boot_data, dir, lp_nrms = 2, power = 0.8, nf_quants,
-  nrm_type = "lp")
+mag_for_pow(
+  boot_data,
+  dir,
+  lp_nrms = 2,
+  power = 0.8,
+  nf_quants,
+  nrm_type = "lp"
+)
 }
 \arguments{
 \item{boot_data}{bootstrap estimates of the (centered) limiting distribution.
@@ -16,10 +22,14 @@ Data where columns correspond to different covariates, and rows are independent 
 \item{dir}{the direction for which we wish to find the magnitude needed to achieve
 the speceified power.}
 
+\item{lp_nrms}{the norms to be used.}
+
 \item{power}{power which the local alternative is to achieve
 for a magnitude that will be solved.}
 
-\item{lp}{the lp norm to be used (ideally it is an integer)}
+\item{nf_quants}{ninety five percent quantiles for each of the different norms}
+
+\item{nrm_type}{the class of norms to be used}
 }
 \value{
 Magnitude for the specified lp norm for a given local alternative.

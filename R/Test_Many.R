@@ -33,7 +33,7 @@ test_one_lp_2 <- function(obs_data, norms = c("max")){
     l_p_distrs[i, ] <- apply(mult_boot, 1, l_p_norm, p = norms[i])
   }
 
-  crit_95_vals <- apply(l_p_distrs, 1, function(x) quantile(x, 0.95) * sqrt(num_obs))
+  crit_95_vals <- apply(l_p_distrs, 1, function(x) stats::quantile(x, 0.95) * sqrt(num_obs))
   test_stat_vals <- vapply(X = norms, FUN = l_p_norm, FUN.VALUE = -99, x = param_est_vals, USE.NAMES = FALSE)
   test_vec <- as.numeric(test_stat_vals > crit_95_vals)
   names(test_vec) <- norms
@@ -70,7 +70,7 @@ find_best_p_pval <- function(train_data, norms = c("max")){
   param_est_vals <- est_spearman(my_data)
   ic_ests <- est_influence_spearman(my_data)
 
-  mult_mat <- matrix(rnorm(1000 * num_obs), nrow = 1000, ncol = num_obs)
+  mult_mat <- matrix(stats::rnorm(1000 * num_obs), nrow = 1000, ncol = num_obs)
   mult_boot <- mult_mat %*% ic_ests / num_obs
   l_p_distrs <- matrix(NA, nrow = length(norms), ncol = 1000)
 
@@ -112,7 +112,7 @@ check_double <- function(Sigma, norms = c("max"), pmethod = "power", sims, ss){
   obs_test <- matrix(NA, ncol = length(norms), nrow = sims)
   dim <- nrow(Sigma)
   for(i in 1:sims){
-    data_i <- mvrnorm(ss * 2, mu = rep(0, dim), Sigma = Sigma)
+    data_i <- MASS::mvrnorm(ss * 2, mu = rep(0, dim), Sigma = Sigma)
     obs_test[i, ] <- test_once_double(data_i, norms = norms, pmethod = pmethod)
   }
   total_time <- proc.time() - ptm
@@ -126,7 +126,7 @@ check_single <- function(Sigma, norms = c("max"), sims, ss){
   obs_test <- matrix(NA, ncol = length(norms), nrow = sims)
   dim <- nrow(Sigma)
   for(i in 1:sims){
-    data_i <- mvrnorm(ss, mu = rep(0, dim), Sigma = Sigma)
+    data_i <- MASS::mvrnorm(ss, mu = rep(0, dim), Sigma = Sigma)
     obs_test[i, ] <- test_one_lp_2(data_i, norms = norms)
   }
   total_time <- proc.time() - ptm

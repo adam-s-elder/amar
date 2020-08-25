@@ -13,7 +13,7 @@
 est_limit_distr <- function(data, param, n = 1000){
   num_obs <- nrow(data)
   ic_ests <- est_influence_pearson(data)
-  eps_mat <- matrix(rnorm(n * num_obs), ncol = num_obs, nrow = n)
+  eps_mat <- matrix(stats::rnorm(n * num_obs), ncol = num_obs, nrow = n)
   cent_boot <- eps_mat %*% ic_ests / sqrt(num_obs)
   return(cent_boot)
 }

@@ -5,6 +5,17 @@
 #### parametric resampling based test that would
 #### optimize the l_p norm within the procedure
 #################################################
+
+
+#' Carry out the test described by Zhang and Laber
+#'
+#' @param obs_data The observed data
+#' @param pos_lp_norms Potential norms to be considered
+#' @param num_folds the number of folds to use in the cross-validation proceedure
+#' @param n_bs_smp the number of bootstrap samples to take when estimating the
+#' limiting distribution
+#' @param nrm_type the class of norms to be selected over.
+#'
 #' @export
 
 laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "lp"){
@@ -13,39 +24,37 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
   num_norms <- length(pos_lp_norms)
   est_param <- est_pearson(obs_data)
   est_cov   <- est_influence_pearson(obs_data)
-  norm_mat  <- matrix(rnorm(n_bs_smp * nrow(est_cov)), nrow = n_bs_smp)
+  norm_mat  <- matrix(stats::rnorm(n_bs_smp * nrow(est_cov)), nrow = n_bs_smp)
   e_lm_dstr <- gen_boot_sample(norm_mat, est_cov, center = TRUE, rate = "rootn")
   cutoff_vals <- rep(NA, num_norms)
   for(nrm_idx in 1:num_norms){
     normalized_obs <- apply(e_lm_dstr, 1, l_p_norm,
                             p = pos_lp_norms[nrm_idx], type = nrm_type)
-    cutoff_vals[nrm_idx] <- quantile(normalized_obs, 0.95)
+    cutoff_vals[nrm_idx] <- stats::quantile(normalized_obs, 0.95)
   }
   param_est <- est_pearson(obs_data)
   lp_perf <- rep(NA, num_norms)
-  magn <- sqrt(sum(param_est ** 2)) * sqrt(length(vald_idx))
   #cat("Magn =", round(magn, 2), " ")
   for(lp_idx in 1:num_norms){
     lp_perf[lp_idx] <- pow_for_mag(e_lm_dstr, dir = param_est,
-                           magn, lp = pos_lp_norms[lp_idx],
-                           nf_quant = cutoff_vals[lp_idx], nrm_type = nrm_type)
+                                   lp = pos_lp_norms[lp_idx],
+                                   nf_quants = cutoff_vals[lp_idx], nrm_type = nrm_type)
   }
 
   test_stat <- max(lp_perf)
   ## Simulating the above proceedure for new data.
-  sim_ts_mat  <- matrix(rnorm(n_bs_smp * nrow(est_cov)),
+  sim_ts_mat  <- matrix(stats::rnorm(n_bs_smp * nrow(est_cov)),
                         nrow = n_bs_smp)
   f_e_lm_dstr <- gen_boot_sample(sim_ts_mat, est_cov, center = TRUE, rate = "rootn")
   boot_sims <- rep(NA, n_bs_smp)
   for(bs in 1:n_bs_smp){
     boot_p_est<-  f_e_lm_dstr[bs, ]
     lp_perf <- rep(NA, num_norms)
-    b_magn <- sqrt(sum(boot_p_est ** 2))
     #if (bs %% 10 == 0){cat("Magn =", round(magn, 2), " ")}
     for(lp_idx in 1:num_norms){
       lp_perf[lp_idx] <- pow_for_mag(e_lm_dstr, dir = boot_p_est,
-                             b_magn, lp = pos_lp_norms[lp_idx],
-                             nf_quant = cutoff_vals[lp_idx], nrm_type = nrm_type)
+                                     lp = pos_lp_norms[lp_idx],
+                                     nf_quants = cutoff_vals[lp_idx], nrm_type = nrm_type)
     }
     boot_sims[bs] <-  max(lp_perf)
 
@@ -55,10 +64,15 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
   return(p_val)
 }
 
+#' Carry out a simplified version of the Zhang and Laber test.
+#' @param observed_data The observed data.
+#' @param ts_sims The number of draws from the test statistic distribution
+#' @param ld_sims The number of draws from the limiting distribution to estiamte each test statistic.
 #' @export
+
 ZL <- function(observed_data, ts_sims, ld_sims){
-  cov_mat <- cov(observed_data)
-  margin_vars <- apply(observed_data[, -1], 2, var)
+  cov_mat <- stats::cov(observed_data)
+  margin_vars <- apply(observed_data[, -1], 2, stats::var)
   x_cor_mat <- diag(1/sqrt(margin_vars)) %*%
     cov_mat[-1, -1] %*%
     diag(1/sqrt(margin_vars))
@@ -80,13 +94,27 @@ ZL <- function(observed_data, ts_sims, ld_sims){
     ts_est_dstr[d_idx] <- est_pows(null_trs_dstr, d_ts)[1]
   }
   p_val <- mean(test_stat[1] >= ts_est_dstr)
-  return(p_val)
+  chsn_nrms <- rep(0, ncol(observed_data))
+  chsn_nrms[test_stat[2]] <- 1
+  return(
+    list(
+      "pvalue" = p_val,
+      "test_stat" = test_stat[1],
+      "test_st_eld" = ts_est_dstr,
+      "chosen_norm" = chsn_nrms,
+      "param_ests" = psi_hats,
+      "param_sds" = sqrt(diag(x_cor_mat))
+    )
+  )
 }
 
+#' Helper function for the Zhang and Laber tests (ZL and ZL_use_infl)
+#' @param obs_data The observed data
 #' @export
+
 get_test_stat <- function(obs_data){
-  marg_vars <- apply(obs_data, 2, var)
-  cov_xy    <- apply(obs_data[, -1], 2, function(x) cov(obs_data[, 1], x))
+  marg_vars <- apply(obs_data, 2, stats::var)
+  cov_xy    <- apply(obs_data[, -1], 2, function(x) stats::cov(obs_data[, 1], x))
   var_y <- marg_vars[1]
   var_x <- marg_vars[-1]
   betas <- cov_xy/var_x
@@ -95,7 +123,14 @@ get_test_stat <- function(obs_data){
   return(t_stats ** 2)
 }
 
+
+#' Estiamte the power using the generated test statistic, and
+#' estimated distribution of the test statistic. Helper
+#' function for ZL and ZL_use_infl
+#' @param tr_lm_dstr limiting distribution of the test statistic
+#' @param ts_vec Vector containing the test statsitic
 #' @export
+
 est_pows <- function(tr_lm_dstr, ts_vec){
   num_opts <- length(ts_vec)
   ord_ts <- cumsum(sort(ts_vec, decreasing = TRUE))
@@ -106,30 +141,56 @@ est_pows <- function(tr_lm_dstr, ts_vec){
   return(c(min(est_p_vals), which.min(est_p_vals)))
 }
 
+
+#' Run a bonferoni based test
+#' @param obs_data The observed data
+#' @param test_type Choose between using pearson correlation
+#' or the mean as the parameter or intrest
+#'
 #' @export
+
 bonf_test <- function(obs_data, test_type = "pearson"){
   if(test_type == "pearson"){
     num_cov <- ncol(obs_data)
-    pvals <- rep(NA, num_cov - 1)
+    pvals <- param_sds <- param_ests <- rep(NA, num_cov - 1)
     for(cov_idx in 2:num_cov){
-      cov_lm <- lm(obs_data[, 1] ~ obs_data[, cov_idx])
+      cov_lm <- stats::lm(obs_data[, 1] ~ obs_data[, cov_idx])
       pvals[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 4]
+      param_ests[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 1]
+      param_sds[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 2]
     }
-  }ifelse(test_type == "mean"){
-    num_cov <- ncol(obs_data)
-    pvals <- rep(NA, num_cov)
-    for(cov_idx in 1:num_cov){
-      pvals[cov_idx] <- t.test(obs_data[, cov_idx])$p.value
+  }else{
+    if(test_type == "mean"){
+      param_ests <- param_sds <- NULL
+      num_cov <- ncol(obs_data)
+      pvals <- rep(NA, num_cov)
+      for(cov_idx in 1:num_cov){
+        pvals[cov_idx] <- stats::t.test(obs_data[, cov_idx])$p.value
+      }
     }
   }
-  return(pvals)
+  return(
+    list(
+      "pvalue" = min(pvals) * length(pvals),
+      "test_stat" = min(pvals) * length(pvals),
+      "test_st_eld" = NULL,
+      "chosen_norm" = NULL,
+      "param_ests" = param_ests,
+      "param_sds" = param_sds
+    )
+  )
 }
 
-
+#' Run a Zhang and Laber test, but use influence functions to obtain estiamtes of variance
+#' Rather than using the parametric model based variance estimates.
+#' @param observed_data The observed data.
+#' @param ts_sims The number of draws from the test statistic distribution
+#' @param ld_sims The number of draws from the limiting distribution to estiamte each test statistic.
 #' @export
+
 ZL_use_infl <- function(observed_data, ts_sims, ld_sims){
-  cov_mat <- cov(observed_data)
-  margin_vars <- apply(observed_data[, -1], 2, var)
+  cov_mat <- stats::cov(observed_data)
+  margin_vars <- apply(observed_data[, -1], 2, stats::var)
   x_cor_mat_p <- est_influence_pearson(observed_data)
   x_cor_mat <- t(x_cor_mat_p) %*% x_cor_mat_p / nrow(observed_data)
   psi_hats <- get_test_stat(observed_data)

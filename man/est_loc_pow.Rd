@@ -5,8 +5,7 @@
 \title{Generate an estimate of the limiting distribution of
 the vector covariate specific parameter estimates}
 \usage{
-est_loc_pow(boot_data, lp = "max", method = "average", tries,
-  magnitude = 3)
+est_loc_pow(boot_data, lp = "max", method = "average", tries, magnitude = 3)
 }
 \arguments{
 \item{boot_data}{bootstrap estimates of the (centered) limiting distribution. Data where

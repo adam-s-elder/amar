@@ -19,16 +19,14 @@
 
 est_influence_spearman <- function(observ){
   n <- nrow(observ)
-
   num_cov <- ncol(observ) - 1
   est_IC <- matrix(NA, nrow = n, ncol = num_cov)
   y_vals <- observ[, 1]
-  Y_ecdf <- ecdf(y_vals)
+  Y_ecdf <- stats::ecdf(y_vals)
   y_ecdf_vals <- Y_ecdf(y_vals)
-
   for(i in 2:(num_cov + 1)){
     x_vals <- observ[, i]
-    X_ecdf <- ecdf(x_vals)
+    X_ecdf <- stats::ecdf(x_vals)
     x_ecdf_vals <- X_ecdf(x_vals)
     xy_constant <- -3 * mean(x_ecdf_vals * y_ecdf_vals)
     ic_fun <- function(x, y){xy_constant + X_ecdf(x) * Y_ecdf(y) +
@@ -40,9 +38,14 @@ est_influence_spearman <- function(observ){
 }
 
 est_spearman <- function(observ){
-  num_var <- ncol(observ)
-  return(cor(observ[, 1], observ[, -1], method = "spearman"))
+  return(stats::cor(observ[, 1], observ[, -1], method = "spearman"))
 }
 
-spearman <- list("est_IC" = est_influence_spearman, "est_param" = est_spearman)
+spearman <- function(est_or_IC){
+  if(est_or_IC == "est"){return(est_spearman)}
+  if(est_or_IC == "IC"){return(est_influence_spearman)}
+  else{stop("You must specify if you want the estimate of the parameter (est),
+            or the influence curve (IC)")}
+}
+
 

@@ -5,8 +5,7 @@
 \title{A function used to select which l_p norm to use for
 a given test.}
 \usage{
-select_lp(e_lm_dstr, pos_lp, search_size = 1000, fxd_val = fixed,
-  compare_measure = cmp_meas)
+select_lp(e_lm_dstr, pos_lp, search_size = 1000, fxd_val, compare_measure)
 }
 \arguments{
 \item{e_lm_dstr}{is the estimated limiting distribution}

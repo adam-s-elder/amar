@@ -16,8 +16,7 @@
 #'
 #' @export
 
-select_lp <- function(e_lm_dstr, pos_lp, search_size = 1000, fxd_val = fixed,
-                      compare_measure = cmp_meas){
+select_lp <- function(e_lm_dstr, pos_lp, search_size = 1000, fxd_val, compare_measure){
   num_norms <- length(pos_lp)
   num_covs  <- ncol(e_lm_dstr)
   cutoffs   <- rep(NA, num_norms)
@@ -28,7 +27,7 @@ select_lp <- function(e_lm_dstr, pos_lp, search_size = 1000, fxd_val = fixed,
   }
   for(bb in 1:num_norms){
     lp_norm_distr <- apply(e_lm_dstr, 1, l_p_norm, p = pos_lp[bb])
-    cutoffs[bb]   <- quantile(lp_norm_distr, 0.95)
+    cutoffs[bb]   <- stats::quantile(lp_norm_distr, 0.95)
       }
   if (compare_measure == "mean"){
     search_dirs <- r_unif_sphere(num_covs, search_size)

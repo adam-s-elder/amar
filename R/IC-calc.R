@@ -16,6 +16,9 @@
 # function.  The first column of your data should correspond to the
 #' variable of interest (the variable for which pearson correlation is
 #' calculated.
+#' @param observ the observed data
+#' @param trans If there is a transformation of the parameter of interest
+#'
 #' @export
 
 est_influence_pearson <- function(observ, trans = "none"){
@@ -38,15 +41,15 @@ est_influence_pearson <- function(observ, trans = "none"){
     return(ic)
   }else if(trans == "tsqd"){
     num_var <- ncol(observ)
-    rho <- cor(observ[, 1], observ[, -1], method = "pearson")[1, ]
+    rho <- stats::cor(observ[, 1], observ[, -1], method = "pearson")[1, ]
     mat_mult <- diag(2 * rho / (1 - rho ** 2) ** 2)
-    return(ic  %*% t(mat_mult))
+    return(ic %*% t(mat_mult))
   }
 }
 
 est_pearson <- function(observ, trans = "none"){
     num_var <- ncol(observ)
-    rho <- cor(observ[, 1], observ[, -1], method = "pearson")
+    rho <- stats::cor(observ[, 1], observ[, -1], method = "pearson")
     if(trans == "tsqd"){
       return(rho ** 2 / (1 - rho ** 2))
     }else{
@@ -54,65 +57,36 @@ est_pearson <- function(observ, trans = "none"){
     }
 }
 
-pearson <- list("est_IC" = est_influence_pearson, "est_param" = est_pearson)
-
-
-#### The following function will take a set of observations, and return the
-#### estimated covariance matrix for the estimates of the spearman correlation.
-#### Estimates of the covariance are generated using the empirical influence
-#### function.  The first column of your data should correspond to the
-#### variable of interest (the variable for which spearman correlation is
-#### calculated.
-
-
-est_influence_spearman <- function(observ){
-  n <- nrow(observ)
-  num_cov <- ncol(observ) - 1
-  est_IC <- matrix(NA, nrow = n, ncol = num_cov)
-  y_vals <- observ[, 1]
-  Y_ecdf <- ecdf(y_vals)
-  y_ecdf_vals <- Y_ecdf(y_vals)
-
-  for(i in 2:(num_cov + 1)){
-    x_vals <- observ[, i]
-    X_ecdf <- ecdf(x_vals)
-    x_ecdf_vals <- X_ecdf(x_vals)
-    xy_constant <- -3 * mean(x_ecdf_vals * y_ecdf_vals)
-    ic_fun <- function(x, y){xy_constant + X_ecdf(x) * Y_ecdf(y) +
-        mean(x_ecdf_vals * ifelse(y_vals >= y, 1, 0)) +
-        mean(y_ecdf_vals * ifelse(x_vals >= x, 1, 0))}
-    est_IC[, i - 1] <- mapply(ic_fun, x_vals, y_vals)
-  }
-  return( 12 * est_IC)
+pearson <- function(est_or_IC){
+  if(est_or_IC == "est"){return(est_pearson)}
+  if(est_or_IC == "IC"){return(est_influence_pearson)}
+  else{stop("You must specify if you want the estimate of the parameter (est),
+            or the influence curve (IC)")}
 }
-
-est_spearman <- function(observ){
-  return(cor(observ[, 1], observ[, -1], method = "spearman"))
-}
-
-spearman <- list("est_IC" = est_influence_spearman, "est_param" = est_spearman)
-
-## Influence function and parameter esitmation for the mean.
-
-est_influence_mean <- function(observ){
-  col_means <- colMeans(x = observ)
-  infl <- sweep(x = observ, MARGIN = 2,
-                STATS = col_means, FUN = "-")
-  return(infl)
-}
-
-est_mean <- function(observ){
-  col_means <- colMeans(x = observ)
-  return(col_means)
-}
-
-mean_f <- list("est_IC" = est_influence_mean, "est_param" = est_mean)
-
-
 
 #### Placing all of the different influence function and parameter estimation
 #### inside of a single function
 
-get_infl <- list("spearman" = spearman, "pearson" = pearson,
-                 "mean" = mean_f)
+#' Wrapper function that provides all of the possible influence functions
+#'
+#' @param param name of the parameter of interest
+#' @param est_or_IC specify if an estimator of the parameter or IC is needed
+#'
+#' @export
 
+
+get_infl <- function(param, est_or_IC){
+  if(param == "spearman"){return(spearman(est_or_IC))}
+  if(param == "pearson"){return(pearson(est_or_IC))}
+  if(param == "mean_f"){return(mean_f(est_or_IC))}
+  if(param == "median"){return(median(est_or_IC))}
+  if(param == "DE2"){return(de_2(est_or_IC))}
+  if(param == "DE2nl"){return(de_2_nl(est_or_IC))}
+  if(param == "DE2KM"){return(de_2_know_mis(est_or_IC))}
+  if(param == "DE3"){return(de_3(est_or_IC))}
+  if(param == "RDE"){return(rde(est_or_IC))}
+  else{
+    stop("The specified parameter is not one of the included parameters,
+         please choose from 'spearman', 'pearson', 'mean_f', 'DE2', or 'DE3'")
+  }
+}

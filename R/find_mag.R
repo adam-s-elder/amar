@@ -3,7 +3,9 @@
 #'
 #' @param one_obs A single observed value from the limiting distribution.
 #' @param dir The shift by which the single observation will moved.  Generally the estimated parameter.
-#' @param cuttoff The cutoff value of the normed limiting distribution. The estimated parameters which will be the mean of the multiplier bootstrap sample.
+#' @param cutoff The cutoff value of the normed limiting distribution. The estimated parameters which will be the mean of the multiplier bootstrap sample.
+#' @param nrm_idx index of the potential norms to be used.
+#' @param nrm_type specifies the type of norm to be used.
 #' @return The magnitude by which the shift must be multiplied to surpass the cutoff for the given observation.
 #'
 #' @export
@@ -37,7 +39,7 @@ find_mag <- function(one_obs, dir, cutoff, nrm_idx, nrm_type){
     if(obj_func(0) >= 0){
       return(-1)
     }else{
-      return(uniroot(f = obj_func, lower = 0, upper = ul)$root)
+      return(stats::uniroot(f = obj_func, lower = 0, upper = ul)$root)
     }
   }
 }

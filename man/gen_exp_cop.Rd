@@ -6,6 +6,13 @@
 \usage{
 gen_exp_cop(n, d, cov)
 }
+\arguments{
+\item{n}{number of observations}
+
+\item{d}{number of dimentions}
+
+\item{cov}{desired covaraince}
+}
 \description{
 Functions for creating data
 }

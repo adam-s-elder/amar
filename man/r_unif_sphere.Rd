@@ -7,6 +7,11 @@ unit ball (mainly used to generate random directions).}
 \usage{
 r_unif_sphere(n_covs, n_obs)
 }
+\arguments{
+\item{n_covs}{Number of covariates}
+
+\item{n_obs}{Number of observations}
+}
 \description{
 This function is used to generate random observations from the
 unit ball (mainly used to generate random directions).

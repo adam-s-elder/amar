@@ -16,4 +16,7 @@
 #### variable of interest (the variable for which spearman correlation is
 #### calculated.
 
+median <- function(...){
+  stop("This function has not yet been written")
+}
 

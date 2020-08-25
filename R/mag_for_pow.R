@@ -4,9 +4,11 @@
 #'
 #' @param boot_data bootstrap estimates of the (centered) limiting distribution.
 #' Data where columns correspond to different covariates, and rows are independent observations.
-#' @param lp the lp norm to be used (ideally it is an integer)
+#' @param lp_nrms the norms to be used.
+#' @param nrm_type the class of norms to be used
 #' @param dir the direction for which we wish to find the magnitude needed to achieve
 #' the speceified power.
+#' @param nf_quants ninety five percent quantiles for each of the different norms
 #' @param power power which the local alternative is to achieve
 #' for a magnitude that will be solved.
 #'
@@ -32,7 +34,7 @@ mag_for_pow <- function(boot_data, dir, lp_nrms = 2, power = 0.8, nf_quants, nrm
         all_opts <- pmax((nf_quant - xs) / dir, (-nf_quant - xs )/ dir)
         many_mags[obs_idx] <- min(pmax(0, all_opts))
       }
-      mfp <- quantile(many_mags, power)
+      mfp <- stats::quantile(many_mags, power)
       norm_res[norm_idx] <- mfp
     }else{
       lp <- as.numeric(lp)
@@ -41,7 +43,7 @@ mag_for_pow <- function(boot_data, dir, lp_nrms = 2, power = 0.8, nf_quants, nrm
         roots[root_idx] <- find_mag(one_obs = sing_obs, dir = dir, cutoff = nf_quant,
                                     nrm_idx = lp, nrm_type = nrm_type)
       }
-      norm_res[norm_idx] <- quantile(roots, power)
+      norm_res[norm_idx] <- stats::quantile(roots, power)
     }
   }
   names(norm_res) <- lp_nrms

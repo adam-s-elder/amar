@@ -4,7 +4,7 @@
 #' the limiting distribution under the null
 #' @param dir the observed estimate of the parameter
 #' @param lp the index for the norm used
-#' @param nrm_typ the type of norm used
+#' @param nrm_type the type of norm used
 #'
 #' @export
 
@@ -15,7 +15,7 @@ pval_for_mag <- function(boot_data, dir, lp = 2, nrm_type = "lp"){
   distr <- matrix(NA, nrow = nrow(boot_data), ncol = num_norms)
   if(nrm_type == "ordl2"){
     num_obs <- nrow(boot_data)
-    trans_dir <- cumsum(dir ** 2, decreasing = TRUE)
+    trans_dir <- cumsum(dir ** 2)
     for(obs_idx in 1:num_obs){
       distr[obs_idx, ] <- cumsum(sort(boot_data[obs_idx, ] ** 2, decreasing = TRUE))
     }

@@ -5,9 +5,23 @@
 \title{This is an intermediate function inbetween the cv_test and one_fold_est functions which
 allows for specification of the measure of performance.}
 \usage{
-est_cv(obs_data, est_infl, pos_lp_norms, nrm_type, est_func, n_bs_smp,
-  test_stat_func, trn_mlt, num_folds, pref_meas, f_cv_summary = mean,
-  est_lm_distr = NULL, return_lmd = FALSE)
+est_cv(
+  obs_data,
+  est_infl,
+  pos_lp_norms,
+  nrm_type,
+  est_func,
+  n_bs_smp,
+  test_stat_func,
+  trn_mlt,
+  num_folds,
+  pref_meas,
+  f_cv_summary = mean,
+  est_lm_distr = NULL,
+  return_lmd = FALSE,
+  view_IC = FALSE,
+  nrmlize = FALSE
+)
 }
 \arguments{
 \item{obs_data}{The observed data to be used for finding the optimal norm (training),
@@ -21,6 +35,8 @@ norms_indx specifies the different p's to try.}
 
 \item{nrm_type}{The type of norm to be used for the test.  Generally the l_p norm.}
 
+\item{est_func}{Function that estimates the parameter.}
+
 \item{n_bs_smp}{Number of samples to be used in estimating the limiting distribution of the
 test statistic under the null.}
 
@@ -28,19 +44,22 @@ test statistic under the null.}
 given fold (using the testing data), and uses the best
 norm (decided on using the training data).}
 
+\item{trn_mlt}{Multiplier which specifies if the larger set of data will be in the training or
+testing set.}
+
 \item{num_folds}{The number of folds to be used in the cross-validation proceedure.  If set to 1,
 no cross validation will be used.}
+
+\item{pref_meas}{the prefered measure used to generate the test statistic.}
 
 \item{f_cv_summary}{How test statistics from different folds are combined to create an overall
 test statistic.  Usually the mean is used.}
 
-\item{big_train}{Data is split into splits of roughly equal sizes. The number of splits is equal
-to num_folds. If big_train is TRUE then all but one of these splits will be training data,
-if big_train is FALSE all but one will be testing data.}
+\item{est_lm_distr}{An estimate of the limiting distribution if it is provided}
 
-\item{num_folds}{The number of folds desired for the cross-validated parameter estimate (usually 1).}
+\item{return_lmd}{Boolean for whether or not to return the estimated limiting distribution.}
 
-\item{incl_chsn_norm}{Boolean indicating if chosen norm index should be returned.}
+\item{nrmlize}{Boolean for if the estimator should be normalized to have a limiting distribution with identity covaraince matrix.}
 }
 \value{
 learned test statistic for a single fold of data

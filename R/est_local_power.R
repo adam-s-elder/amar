@@ -23,7 +23,7 @@ est_loc_pow <- function(boot_data, lp = "max", method = "average",
     ##Solving for the estimated 95% quantile of the l_p norm of
     ##the centered limiting distribution of parameter estiamtes.
     norm_boot <- apply(boot_data, 1, l_p_norm, p = lp[p_indx])
-    crits[p_indx] <- quantile(norm_boot, 0.95)
+    crits[p_indx] <- stats::quantile(norm_boot, 0.95)
   }
   if (method == "average"){
    pows <- matrix(-1, nrow = tries, ncol = length(lp))
@@ -47,7 +47,7 @@ est_loc_pow <- function(boot_data, lp = "max", method = "average",
         norm_shift_distr <- apply(shift_distr, 1, l_p_norm, p = lp[p_indx])
         return( - mean(as.numeric(norm_shift_distr > crits[p_indx])))
       }
-      opt_solv <- ga(type = "real-valued", fitness = obj_fun, lower = rep(-1, n_covs),
+      opt_solv <- GA::ga(type = "real-valued", fitness = obj_fun, lower = rep(-1, n_covs),
          upper = rep(1, n_covs), popSize = tries, run = 10, monitor = FALSE)
       minpows[p_indx] <- opt_solv@fitnessValue
     }

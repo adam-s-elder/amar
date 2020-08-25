@@ -12,7 +12,11 @@ find_mag(one_obs, dir, cutoff, nrm_idx, nrm_type)
 
 \item{dir}{The shift by which the single observation will moved.  Generally the estimated parameter.}
 
-\item{cuttoff}{The cutoff value of the normed limiting distribution. The estimated parameters which will be the mean of the multiplier bootstrap sample.}
+\item{cutoff}{The cutoff value of the normed limiting distribution. The estimated parameters which will be the mean of the multiplier bootstrap sample.}
+
+\item{nrm_idx}{index of the potential norms to be used.}
+
+\item{nrm_type}{specifies the type of norm to be used.}
 }
 \value{
 The magnitude by which the shift must be multiplied to surpass the cutoff for the given observation.

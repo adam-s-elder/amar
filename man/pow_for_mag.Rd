@@ -16,9 +16,9 @@ Data where columns correspond to different covariates, and rows are independent 
 
 \item{lp}{the lp norms to be used (ideally integers).}
 
-\item{nf_quant}{the cutoff values for the distribution under the null and each lp norm.}
+\item{nf_quants}{the cutoff values for the distribution under the null and each lp norm.}
 
-\item{nrms_type}{}
+\item{nrm_type}{the class of norms to select over.}
 }
 \value{
 Magnitude for the specified lp norm for a given local alternative.
