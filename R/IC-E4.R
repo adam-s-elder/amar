@@ -1,4 +1,4 @@
-de3_ic <- function(obs_data){
+e4_ic <- function(obs_data){
   w_covs <- which(!colnames(obs_data) %in% c("y", "a"))
   fin_IC <- matrix(NA, nrow = nrow(obs_data),
                    ncol = ncol(obs_data) - 2)
@@ -7,18 +7,19 @@ de3_ic <- function(obs_data){
                          V = obs_data[, w_covs[cov_idx]],
                          A = obs_data$a,
                          W = obs_data[, w_covs[-cov_idx]],
-                         MSM = "A*V", gform = A~1,
+                         MSM = "A*V",
+                         gform = A ~ w.10,
+                         g.SL.library = list("SL.glmnet"),
+                         Q.SL.library = list("SL.glmnet"),
                          hAVform = A~1, family = "binomial",
-                         g.SL.library = NULL,
-                         Q.SL.library = list(#"SL.glm",
-                           c("SL.glmnet", "screen.glmnet")),
-                         ret_IC = TRUE)
+                         ret_IC = TRUE,
+                         inference = TRUE)
     fin_IC[, cov_idx] <- cov_IC$IC[, 4]
   }
   return(fin_IC)
 }
 
-de3_est <- function(obs_data){
+e4_est <- function(obs_data){
   w_covs <- which(!colnames(obs_data) %in% c("y", "a", "v"))
   psi_hat <- rep(NA, length(w_covs))
   for(cov_idx in 1:length(w_covs)){
@@ -26,10 +27,10 @@ de3_est <- function(obs_data){
                          V = obs_data[, w_covs[cov_idx]],
                          A = obs_data$a,
                          W = obs_data[, w_covs[-cov_idx]],
-                         MSM = "A*V", Qform = Y~., gform = A~1,
-                         g.SL.library = NULL,
-                         Q.SL.library = list(#"SL.glm",
-                           c("SL.glmnet", "screen.glmnet")),
+                         MSM = "A*V",
+                         gform = A ~ w.10,
+                         g.SL.library = list("SL.glmnet"),
+                         Q.SL.library = list("SL.glmnet"),
                          hAVform = A~1, family = "binomial",
                          ret_IC = FALSE,
                          inference = FALSE)
@@ -134,7 +135,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
                        hAV=NULL, hAVform=NULL,
                        g1W = NULL, gform=NULL,
                        pDelta1=NULL, g.Deltaform=NULL,
-                       g.SL.library = NULL, # c("SL.glm", "SL.step", "SL.glm.interaction")
+                       g.SL.library = NULL,
                        ub = 1/0.025,
                        family="gaussian", fluctuation="logistic", alpha  = 0.995,
                        id=1:length(Y), V_SL=5, inference=TRUE, verbose=FALSE, ret_IC = TRUE) {
@@ -261,13 +262,15 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
     }
     se <- sqrt(diag(sigma))
     pvalue <- 2*stats::pnorm(-abs(psi.Qstar/se))
-    lb <- psi.Qstar -1.96 * se
-    ub <- psi.Qstar +1.96 * se
+    lb <- psi.Qstar - 1.96 * se
+    ub <- psi.Qstar + 1.96 * se
   } else {
     sigma <- se <- lb <- ub <- pvalue <- IC <- NULL
   }
   Qinit$Q <- Qinit$Q[,-1]
-  returnVal <- list(psi=psi.Qstar, sigma=sigma,se=se, pvalue=pvalue, lb=lb, ub=ub, epsilon=epsilon,  psi.Qinit=psi.Qinit,  Qstar=Qstar[,-1], Qinit=Qinit, g=g, g.AV=gAV, g.Delta=g.Delta, IC=IC)
+  returnVal <- list(
+    psi=psi.Qstar, sigma=sigma,se=se, pvalue=pvalue, lb=lb, ub=ub, epsilon=epsilon,  psi.Qinit=psi.Qinit,  Qstar=Qstar[,-1], Qinit=Qinit, g=g, g.AV=gAV, g.Delta=g.Delta, IC=IC
+    )
   class(returnVal) <- "tmleMSM"
   return(returnVal)
 }
@@ -860,9 +863,9 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 }
 
 
-de_3 <- function(est_or_IC){
-  if(est_or_IC == "est"){return(de3_est)}
-  if(est_or_IC == "IC"){return(de3_ic)}
+e_4 <- function(est_or_IC){
+  if(est_or_IC == "est"){return(e4_est)}
+  if(est_or_IC == "IC"){return(e4_ic)}
   else{stop("You must specify if you want the estimate of the parameter (est),
             or the influence curve (IC)")}
 }

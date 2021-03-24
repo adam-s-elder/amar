@@ -4,9 +4,9 @@
 \alias{est_influence_pearson}
 \title{The following function will take a set of observations, and return the
 variable of interest (the variable for which pearson correlation is
-calculated.}
+calculated).}
 \usage{
-est_influence_pearson(observ, trans = "none")
+est_influence_pearson(observ)
 }
 \arguments{
 \item{observ}{the observed data}
@@ -16,5 +16,5 @@ est_influence_pearson(observ, trans = "none")
 \description{
 The following function will take a set of observations, and return the
 variable of interest (the variable for which pearson correlation is
-calculated.
+calculated).
 }

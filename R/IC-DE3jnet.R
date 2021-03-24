@@ -1,4 +1,4 @@
-de3_ic <- function(obs_data){
+de3_ic_jn <- function(obs_data){
   w_covs <- which(!colnames(obs_data) %in% c("y", "a"))
   fin_IC <- matrix(NA, nrow = nrow(obs_data),
                    ncol = ncol(obs_data) - 2)
@@ -8,17 +8,19 @@ de3_ic <- function(obs_data){
                          A = obs_data$a,
                          W = obs_data[, w_covs[-cov_idx]],
                          MSM = "A*V", gform = A~1,
-                         hAVform = A~1, family = "binomial",
+                       hAVform = A~1, Qform = Y~1,
+                         family = "binomial",
                          g.SL.library = NULL,
-                         Q.SL.library = list(#"SL.glm",
-                           c("SL.glmnet", "screen.glmnet")),
+                         Q.SL.library = NULL, #list(#"SL.glm",
+                                        #c("SL.glmnet")),
+                                            # ,"screen.glmnet")),
                          ret_IC = TRUE)
     fin_IC[, cov_idx] <- cov_IC$IC[, 4]
   }
   return(fin_IC)
 }
 
-de3_est <- function(obs_data){
+de3_est_jn <- function(obs_data){
   w_covs <- which(!colnames(obs_data) %in% c("y", "a", "v"))
   psi_hat <- rep(NA, length(w_covs))
   for(cov_idx in 1:length(w_covs)){
@@ -26,10 +28,11 @@ de3_est <- function(obs_data){
                          V = obs_data[, w_covs[cov_idx]],
                          A = obs_data$a,
                          W = obs_data[, w_covs[-cov_idx]],
-                         MSM = "A*V", Qform = Y~., gform = A~1,
+                         MSM = "A*V", Qform = Y~1, gform = A~1,
                          g.SL.library = NULL,
-                         Q.SL.library = list(#"SL.glm",
-                           c("SL.glmnet", "screen.glmnet")),
+                         Q.SL.library = NULL,#list(#"SL.glm",
+                                        #  c("SL.glmnet")),
+                         # "screen.glmnet")),
                          hAVform = A~1, family = "binomial",
                          ret_IC = FALSE,
                          inference = FALSE)
@@ -234,7 +237,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
                         wts=c(hAV[,"h0V"], hAV[,"h1V"]))
   suppressWarnings(
     psi.Qstar <- stats::coef(stats::glm(MSMformula, data=d.Qstar,
-                                        weights=d.Qstar$wts, family=family))
+                          weights=d.Qstar$wts, family=family))
   )
   d.Qinit <- replace(d.Qstar,1, c(Qinit$Q[,"Q0W"], Qinit$Q[,"Q1W"]))
   suppressWarnings(
@@ -456,7 +459,7 @@ estimateQ <- function (Y,Z,A,W, Delta, Q, Qbounds, Qform, maptoYstar,
     } else {
       if(cvQinit){
         m <- try(estQcvSL(Y,X=cbind(Z,A,W),SL.library, family=family,
-                          Delta=Delta, Qbounds=Qbounds,id=id, V_SL = V, verbose=verbose))
+                           Delta=Delta, Qbounds=Qbounds,id=id, V_SL = V, verbose=verbose))
         if(!(identical(class(m), "try-error"))){
           type <- "cross-validated SL"
           Qinit <- m
@@ -616,9 +619,9 @@ estimateG <- function (d,g1W, gform, SL.library, id, V, verbose, message, outcom
       if(outcome=="Z"){
         if(identical(class(m),"SuperLearner")){
           g1W <- cbind(stats::predict(m, newdata=data.frame(A=0, newdata[,-(1:2), drop=FALSE]), type="response",
-                                      X=d[,-1, drop=FALSE], Y=d[,1])[[1]],
+                               X=d[,-1, drop=FALSE], Y=d[,1])[[1]],
                        stats::predict(m, newdata=data.frame(A=1, newdata[,-(1:2), drop=FALSE]), type="response",
-                                      X=d[,-1, drop=FALSE], Y=newdata[,1])[[1]])
+                               X=d[,-1, drop=FALSE], Y=newdata[,1])[[1]])
         } else {
           g1W <- cbind(stats::predict(m, newdata=data.frame(A=0, newdata[,-(1:2), drop=FALSE]), type="response"),
                        stats::predict(m, newdata=data.frame(A=1, newdata[,-(1:2), drop=FALSE]), type="response"))
@@ -628,13 +631,13 @@ estimateG <- function (d,g1W, gform, SL.library, id, V, verbose, message, outcom
       } else if (outcome=="D"){
         if(identical(class(m),"SuperLearner")){
           g1W <- cbind(stats::predict(m, newdata=data.frame(Z=0, A=0, newdata[,-(1:3), drop=FALSE]), type="response",
-                                      X=d[,-1,drop=FALSE], Y=d[,1])[[1]],
+                               X=d[,-1,drop=FALSE], Y=d[,1])[[1]],
                        stats::predict(m, newdata=data.frame(Z=0, A=1, newdata[,-(1:3), drop=FALSE]), type="response",
-                                      X=d[,-1, drop=FALSE], Y=d[,1])[[1]],
+                               X=d[,-1, drop=FALSE], Y=d[,1])[[1]],
                        stats::predict(m, newdata=data.frame(Z=1, A=0, newdata[,-(1:3), drop=FALSE]), type="response",
-                                      X=d[,-1, drop=FALSE], Y=d[,1])[[1]],
+                               X=d[,-1, drop=FALSE], Y=d[,1])[[1]],
                        stats::predict(m, newdata=data.frame(Z=1, A=1, newdata[,-(1:3), drop=FALSE]), type="response",
-                                      X=d[,-1, drop=FALSE], Y=d[,1])[[1]])
+                               X=d[,-1, drop=FALSE], Y=d[,1])[[1]])
         } else{
           g1W <- cbind(stats::predict(m, newdata=data.frame(Z=0, A=0, newdata[,-(1:3), drop=FALSE]), type="response"),
                        stats::predict(m, newdata=data.frame(Z=0, A=1, newdata[,-(1:3), drop=FALSE]), type="response"),
@@ -818,7 +821,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
                         wts=c(hAV[,"h0V"], hAV[,"h1V"]))
   suppressWarnings(
     psi.Qstar <- stats::coef(stats::glm(MSMformula, data=d.Qstar,
-                                        weights=d.Qstar$wts, family=family))
+                          weights=d.Qstar$wts, family=family))
   )
   d.Qinit <- replace(d.Qstar,1, c(Qinit$Q[,"Q0W"], Qinit$Q[,"Q1W"]))
   suppressWarnings(
@@ -860,9 +863,9 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 }
 
 
-de_3 <- function(est_or_IC){
-  if(est_or_IC == "est"){return(de3_est)}
-  if(est_or_IC == "IC"){return(de3_ic)}
+de_3_jn <- function(est_or_IC){
+  if(est_or_IC == "est"){return(de3_est_jn)}
+  if(est_or_IC == "IC"){return(de3_ic_jn)}
   else{stop("You must specify if you want the estimate of the parameter (est),
             or the influence curve (IC)")}
 }
