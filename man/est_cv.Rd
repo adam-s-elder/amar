@@ -7,20 +7,11 @@ allows for specification of the measure of performance.}
 \usage{
 est_cv(
   obs_data,
-  est_infl,
-  pos_lp_norms,
-  nrm_type,
-  est_func,
-  n_bs_smp,
-  test_stat_func,
-  trn_mlt,
-  num_folds,
-  pref_meas,
-  f_cv_summary = mean,
+  param_est,
+  control,
   est_lm_distr = NULL,
   return_lmd = FALSE,
-  view_IC = FALSE,
-  nrmlize = FALSE
+  view_IC = FALSE
 )
 }
 \arguments{
@@ -28,38 +19,18 @@ est_cv(
 and finding the test statistic (testing).  Similar to above, each row is an observation and each
 column corresponds to either the outcome (first column) or a covariate.}
 
-\item{est_infl}{Estimate of the influence function, if one exists.}
+\item{param_est}{A function used to estimate both they parameter of interest
+and the IC of the corresponding estimator.}
 
-\item{pos_lp_norms}{The index of the norms to be considered.  For example if we use the l_p norm,
-norms_indx specifies the different p's to try.}
+\item{control}{A list providing control arguments for the function.}
 
-\item{nrm_type}{The type of norm to be used for the test.  Generally the l_p norm.}
+\item{est_lm_distr}{An estimate of the limiting distribution
+if it is provided.}
 
-\item{est_func}{Function that estimates the parameter.}
+\item{return_lmd}{Boolean for whether to return the estimated
+limiting distribution.}
 
-\item{n_bs_smp}{Number of samples to be used in estimating the limiting distribution of the
-test statistic under the null.}
-
-\item{test_stat_func}{A function that will provide the test statistic for the
-given fold (using the testing data), and uses the best
-norm (decided on using the training data).}
-
-\item{trn_mlt}{Multiplier which specifies if the larger set of data will be in the training or
-testing set.}
-
-\item{num_folds}{The number of folds to be used in the cross-validation proceedure.  If set to 1,
-no cross validation will be used.}
-
-\item{pref_meas}{the prefered measure used to generate the test statistic.}
-
-\item{f_cv_summary}{How test statistics from different folds are combined to create an overall
-test statistic.  Usually the mean is used.}
-
-\item{est_lm_distr}{An estimate of the limiting distribution if it is provided}
-
-\item{return_lmd}{Boolean for whether or not to return the estimated limiting distribution.}
-
-\item{nrmlize}{Boolean for if the estimator should be normalized to have a limiting distribution with identity covaraince matrix.}
+\item{view_IC}{Boolean for whether to see summaries of the IC}
 }
 \value{
 learned test statistic for a single fold of data

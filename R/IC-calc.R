@@ -16,93 +16,58 @@
 # function.  The first column of your data should correspond to the
 #' variable of interest (the variable for which pearson correlation is
 #' calculated).
-#' @param observ the observed data
-#' @param trans If there is a transformation of the parameter of interest
+#' @param observ the observed data.  The first column should be the outcome.
+#' @param what the desired return value. Should be one of `"ic"`
+#' (infludence curve), `"est"` (estimate), or `"both"`.
+#' @param control any other control parameters to be passed to the estimator.
 #'
 #' @export
 
-est_influence_pearson <- function(observ){
-  n <- nrow(observ)
-  num_cov <- ncol(observ) - 1
-  means <- colMeans(observ)
-  obs_cent <- observ - matrix(
-    rep(means, each = n),
-    nrow = n, byrow = FALSE
-    )
-  sigmas <- apply(
-    obs_cent, 2,
-    function(x) mean(x ** 2) ** (1 / 2)
-  )
-  covs <- as.numeric(crossprod(obs_cent[, 1, drop = FALSE],
-                               obs_cent[, -1]))/n
-  x_sd <- sigmas[-1]
-  y_sd <- sigmas[1]
-  cors <- covs / (y_sd * x_sd)
-  cent_cov <-
-    sweep(obs_cent[, -1, drop = FALSE], MARGIN = 1, obs_cent[, 1], `*`)
-
-  piece_one <-  sweep(cent_cov, MARGIN = 2,
-                      1 / (y_sd * x_sd), `*`)
-  piece_two <- sweep(obs_cent[, -1, drop = FALSE] ** 2, MARGIN = 2,
-                     1 / (x_sd ** 2), `*`)
-  piece_three <- matrix(
-    rep(obs_cent[, 1] ** 2 / y_sd ** 2, each = num_cov),
-    ncol = num_cov, byrow = TRUE
-  )
-
-  my_var <- piece_one -
-    sweep(piece_two + piece_three,
-          MARGIN = 2, (1 / 2) * cors, `*`)
-
-  return(my_var)
-}
-
-est_pearson <- function(observ, trans = "none"){
-    num_var <- ncol(observ)
-    rho <- stats::cor(observ[, 1], observ[, -1], method = "pearson")
-    if(trans == "tsqd"){
-      return(rho ** 2 / (1 - rho ** 2))
-    }else{
-      return(rho)
-    }
-}
-
-pearson <- function(est_or_IC){
-  if(est_or_IC == "est"){return(est_pearson)}
-  if(est_or_IC == "IC"){return(est_influence_pearson)}
-  else{stop("You must specify if you want the estimate of the parameter (est),
-            or the influence curve (IC)")}
-}
-
-#### Placing all of the different influence function and parameter estimation
-#### inside of a single function
-
-#' Wrapper function that provides all of the possible influence functions
-#'
-#' @param param name of the parameter of interest
-#' @param est_or_IC specify if an estimator of the parameter or IC is needed
-#'
-#' @export
-
-
-get_infl <- function(param, est_or_IC){
-  if(param == "spearman"){return(spearman(est_or_IC))}
-  if(param == "pearson"){return(pearson(est_or_IC))}
-  if(param == "mean_f"){return(mean_f(est_or_IC))}
-  if(param == "median"){return(median(est_or_IC))}
-  if(param == "DE2"){return(de_2(est_or_IC))}
-  if(param == "DE2nl"){return(de_2_nl(est_or_IC))}
-  if(param == "DE2KM"){return(de_2_know_mis(est_or_IC))}
-  if(param == "DE3"){return(de_3(est_or_IC))}
-  if(param == "DE3JN"){return(de_3_jn(est_or_IC))}
-  if(param == "E4"){return(e_4(est_or_IC))}
-  if(param == "RDE"){return(rde(est_or_IC))}
-  else{
-    stop("The specified parameter is not one of the included parameters,
-         please choose from 'spearman', 'pearson', 'mean_f', 'DE2', or 'DE3'")
+ic.pearson <- function(observ, what = "both", control = NULL){
+  if (!(what %in% c("ic", "est", "both"))) {
+    stop("what must be one of ic (influence curve), est (estimate), or both")
   }
-}
+  ret <- list()
+  if (what %in% c("ic", "both")) {
+    n <- nrow(observ)
+    num_cov <- ncol(observ) - 1
+    means <- colMeans(observ)
+    obs_cent <- observ - matrix(
+      rep(means, each = n),
+      nrow = n, byrow = FALSE
+    )
+    sigmas <- apply(
+      obs_cent, 2,
+      function(x) mean(x ** 2) ** (1 / 2)
+    )
+    covs <- as.numeric(crossprod(obs_cent[, 1, drop = FALSE],
+                                 obs_cent[, -1]))/n
+    x_sd <- sigmas[-1]
+    y_sd <- sigmas[1]
+    cors <- covs / (y_sd * x_sd)
+    cent_cov <-
+      sweep(obs_cent[, -1, drop = FALSE], MARGIN = 1, obs_cent[, 1], `*`)
 
+    piece_one <-  sweep(cent_cov, MARGIN = 2,
+                        1 / (y_sd * x_sd), `*`)
+    piece_two <- sweep(obs_cent[, -1, drop = FALSE] ** 2, MARGIN = 2,
+                       1 / (x_sd ** 2), `*`)
+    piece_three <- matrix(
+      rep(obs_cent[, 1] ** 2 / y_sd ** 2, each = num_cov),
+      ncol = num_cov, byrow = TRUE
+    )
+
+    ic <- piece_one -
+      sweep(piece_two + piece_three,
+            MARGIN = 2, (1 / 2) * cors, `*`)
+
+    ret$ic <- ic
+  }
+  if (what %in% c("both", "est") ) {
+    ret$est <- stats::cor(observ[, 1], observ[, -1], method = "pearson")
+  }
+  return(ret)
+}
 
 ## Check Estimation Procedure.
 # num_sims <- 100000

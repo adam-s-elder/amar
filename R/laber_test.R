@@ -22,8 +22,9 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
   ## The cross validation procedure for our observed data
   num_obs   <- nrow(obs_data)
   num_norms <- length(pos_lp_norms)
-  est_param <- est_pearson(obs_data)
-  est_cov   <- est_influence_pearson(obs_data)
+  est_and_ic <- ic.pearson(obs_data, what = "both")
+  est_cov   <- est_and_ic$ic
+  param_est <-  est_and_ic$est
   norm_mat  <- matrix(stats::rnorm(n_bs_smp * nrow(est_cov)), nrow = n_bs_smp)
   e_lm_dstr <- gen_boot_sample(norm_mat, est_cov, center = TRUE, rate = "rootn")
   cutoff_vals <- rep(NA, num_norms)
@@ -32,7 +33,6 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
                             p = pos_lp_norms[nrm_idx], type = nrm_type)
     cutoff_vals[nrm_idx] <- stats::quantile(normalized_obs, 0.95)
   }
-  param_est <- est_pearson(obs_data)
   lp_perf <- rep(NA, num_norms)
   #cat("Magn =", round(magn, 2), " ")
   for(lp_idx in 1:num_norms){
@@ -47,14 +47,15 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
                         nrow = n_bs_smp)
   f_e_lm_dstr <- gen_boot_sample(sim_ts_mat, est_cov, center = TRUE, rate = "rootn")
   boot_sims <- rep(NA, n_bs_smp)
-  for(bs in 1:n_bs_smp){
-    boot_p_est<-  f_e_lm_dstr[bs, ]
+  for (bs in 1:n_bs_smp) {
+    boot_p_est <-  f_e_lm_dstr[bs, ]
     lp_perf <- rep(NA, num_norms)
     #if (bs %% 10 == 0){cat("Magn =", round(magn, 2), " ")}
-    for(lp_idx in 1:num_norms){
-      lp_perf[lp_idx] <- pow_for_mag(e_lm_dstr, dir = boot_p_est,
-                                     lp = pos_lp_norms[lp_idx],
-                                     nf_quants = cutoff_vals[lp_idx], nrm_type = nrm_type)
+    for(lp_idx in 1:num_norms) {
+      lp_perf[lp_idx] <- pow_for_mag(
+        e_lm_dstr, dir = boot_p_est, lp = pos_lp_norms[lp_idx],
+        nf_quants = cutoff_vals[lp_idx], nrm_type = nrm_type
+        )
     }
     boot_sims[bs] <-  max(lp_perf)
 
@@ -189,9 +190,7 @@ bonf_test <- function(obs_data, test_type = "pearson"){
 #' @export
 
 ZL_use_infl <- function(observed_data, ts_sims, ld_sims){
-  cov_mat <- stats::cov(observed_data)
-  margin_vars <- apply(observed_data[, -1], 2, stats::var)
-  x_cor_mat_p <- est_influence_pearson(observed_data)
+  x_cor_mat_p <- ic.pearson(observed_data, what = "ic")$ic
   x_cor_mat <- t(x_cor_mat_p) %*% x_cor_mat_p / nrow(observed_data)
   psi_hats <- get_test_stat(observed_data)
   null_lm_distr <- MASS::mvrnorm(n = ts_sims, mu = rep(0, length(psi_hats)),

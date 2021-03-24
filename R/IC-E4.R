@@ -1,4 +1,28 @@
-e4_ic <- function(obs_data){
+#' Estimate both the parameter, and the influence
+#' curves used for estimating the projected risk ratio.
+#' These functions will be given an entire dataset, and will
+#' return the estimate for the parameter, and for each
+#' estimated influence curve at each observation. The first column
+#' of your data should correspond to the variable of interest
+#' (the variable for which pearson correlation is calculated).
+#'
+#' Obtain an estimator of the probability delta = 1 given w
+#' @param obs_data the observed data.  The first column should be the outcome.
+#' @param what the desired return value. Should be one of `"ic"`
+#' (infludence curve), `"est"` (estimate), or `"both"`.
+#' @param control any other control parameters to be passed to the estimator.
+#'
+#' @export
+
+rr.msm.ic.4 <- function(obs_data, what = "both", control = NULL){
+  if (!(what %in% c("ic", "est", "both"))) {
+    stop("what must be one of ic (influence curve), est (estimate), or both")
+  }
+  ret <- list()
+  w_covs <- which(!colnames(obs_data) %in% c("y", "a"))
+  fin_IC <- matrix(NA, nrow = nrow(obs_data),
+                   ncol = ncol(obs_data) - 2)
+  psi_hat <- rep(NA, length(w_covs))
   w_covs <- which(!colnames(obs_data) %in% c("y", "a"))
   fin_IC <- matrix(NA, nrow = nrow(obs_data),
                    ncol = ncol(obs_data) - 2)
@@ -7,16 +31,21 @@ e4_ic <- function(obs_data){
                          V = obs_data[, w_covs[cov_idx]],
                          A = obs_data$a,
                          W = obs_data[, w_covs[-cov_idx]],
-                         MSM = "A*V",
-                         gform = A ~ w.10,
+                         MSM = "A*V", gform = A ~ w.10,
                          g.SL.library = list("SL.glmnet"),
                          Q.SL.library = list("SL.glmnet"),
                          hAVform = A~1, family = "binomial",
-                         ret_IC = TRUE,
-                         inference = TRUE)
+                         ret_IC = TRUE, inference = TRUE)
     fin_IC[, cov_idx] <- cov_IC$IC[, 4]
+    psi_hat[cov_idx] <- cov_IC$psi[4]
   }
-  return(fin_IC)
+  if (what %in% c("both", "est")) {
+    ret$est <- psi_hat
+  }
+  if (what %in% c("both", "ic")) {
+    ret$ic <- fin_IC
+  }
+  return(ret)
 }
 
 e4_est <- function(obs_data){
@@ -860,13 +889,5 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   }
   class(returnVal) <- "tmleMSM"
   return(returnVal)
-}
-
-
-e_4 <- function(est_or_IC){
-  if(est_or_IC == "est"){return(e4_est)}
-  if(est_or_IC == "IC"){return(e4_ic)}
-  else{stop("You must specify if you want the estimate of the parameter (est),
-            or the influence curve (IC)")}
 }
 

@@ -1,13 +1,13 @@
 Package: amar
 Type: Package
 Title: Statistical Testing for multiple Hypotheses
-Version: 0.1.0
+Version: 0.1.1
 Author: Adam Elder
 Maintainer: Adam Elder <eldera3@uw.edu>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: MASS, GA, stats, SuperLearner, glmnet, expm
+Imports: MASS, GA, stats, SuperLearner, glmnet, expm, dplyr, rlang, ggplot2, tidyr
 RoxygenNote: 7.1.1

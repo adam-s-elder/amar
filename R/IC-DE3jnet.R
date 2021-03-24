@@ -1,9 +1,29 @@
-de3_ic_jn <- function(obs_data){
+#' Estimate both the parameter, and the influence
+#' curves used for estimating the projected risk ratio.
+#' These functions will be given an entire dataset, and will
+#' return the estimate for the parameter, and for each
+#' estimated influence curve at each observation. The first column
+#' of your data should correspond to the variable of interest
+#' (the variable for which pearson correlation is calculated).
+#'
+#' Obtain an estimator of the probability delta = 1 given w
+#' @param obs_data the observed data.  The first column should be the outcome.
+#' @param what the desired return value. Should be one of `"ic"`
+#' (infludence curve), `"est"` (estimate), or `"both"`.
+#' @param control any other control parameters to be passed to the estimator.
+#'
+#' @export
+
+rr.msm.jn.ic <- function(obs_data, what = "both", control = NULL){
+  if (!(what %in% c("ic", "est", "both"))) {
+    stop("what must be one of ic (influence curve), est (estimate), or both")
+  }
   w_covs <- which(!colnames(obs_data) %in% c("y", "a"))
   fin_IC <- matrix(NA, nrow = nrow(obs_data),
                    ncol = ncol(obs_data) - 2)
+  psi_hat <- rep(NA, length(w_covs))
   for(cov_idx in 1:length(w_covs)){
-    cov_IC <- my_tmleMSM(Y = obs_data$y,
+    cov_IC <- my_tmleMSM.jn(Y = obs_data$y,
                          V = obs_data[, w_covs[cov_idx]],
                          A = obs_data$a,
                          W = obs_data[, w_covs[-cov_idx]],
@@ -16,29 +36,15 @@ de3_ic_jn <- function(obs_data){
                                             # ,"screen.glmnet")),
                          ret_IC = TRUE)
     fin_IC[, cov_idx] <- cov_IC$IC[, 4]
-  }
-  return(fin_IC)
-}
-
-de3_est_jn <- function(obs_data){
-  w_covs <- which(!colnames(obs_data) %in% c("y", "a", "v"))
-  psi_hat <- rep(NA, length(w_covs))
-  for(cov_idx in 1:length(w_covs)){
-    cov_IC <- my_tmleMSM(Y = obs_data$y,
-                         V = obs_data[, w_covs[cov_idx]],
-                         A = obs_data$a,
-                         W = obs_data[, w_covs[-cov_idx]],
-                         MSM = "A*V", Qform = Y~1, gform = A~1,
-                         g.SL.library = NULL,
-                         Q.SL.library = NULL,#list(#"SL.glm",
-                                        #  c("SL.glmnet")),
-                         # "screen.glmnet")),
-                         hAVform = A~1, family = "binomial",
-                         ret_IC = FALSE,
-                         inference = FALSE)
     psi_hat[cov_idx] <- cov_IC$psi[4]
   }
-  return(psi_hat)
+  if (what %in% c("both", "est")) {
+    ret$est <- psi_hat
+  }
+  if (what %in% c("both", "ic")) {
+    ret$ic <- fin_IC
+  }
+  return(ret)
 }
 
 #----- function estQcvSL ----
@@ -63,7 +69,7 @@ de3_est_jn <- function(obs_data){
 #  Q - nx5 matrix of predicted values on linear scale (e.g. logit if Qfamily=binomial)
 #-----------------------------------------------
 
-estQcvSL <- function(Y,X,SL.library=NULL, V=5, V_SL=5, family="gaussian", Delta, Qbounds, id, verbose){
+estQcvSL.jn <- function(Y,X,SL.library=NULL, V=5, V_SL=5, family="gaussian", Delta, Qbounds, id, verbose){
   SL.version <- 2
   Q <- cvRSS <- best_alg <- NULL
   n <- length(Y)
@@ -106,7 +112,7 @@ estQcvSL <- function(Y,X,SL.library=NULL, V=5, V_SL=5, family="gaussian", Delta,
         for (s in 1:n_predictors){
           predictions[fold_rows,s+1] <- m_SL$library.predict[,s]
         }
-        predictions <- .bound(predictions, Qbounds)
+        predictions <- .bound.jn(predictions, Qbounds)
       } else {
         stop("Super Learner failed when estimating Q. Exiting program\n")
       }
@@ -130,7 +136,7 @@ estQcvSL <- function(Y,X,SL.library=NULL, V=5, V_SL=5, family="gaussian", Delta,
 ## Needed Functions:
 
 
-my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM, v=NULL,
+my_tmleMSM.jn <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM, v=NULL,
                        Q=NULL, Qform=NULL,
                        Qbounds=c(-Inf, Inf), Q.SL.library=c("SL.glm", "SL.glmnet"),
                        cvQinit = FALSE,
@@ -150,35 +156,35 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
     I.V <- as.numeric(V==v)
   }
   V <- as.matrix(V)
-  colnames(V) <- .setColnames(colnames(V), NCOL(V), "V")
+  colnames(V) <- .setColnames.jn(colnames(V), NCOL(V), "V")
 
   if (sum(!sapply(W, is.numeric)) > 0) {
     stop("Currently, only numeric variables are allowed.  Please convert any character or factor variables to numeric.")
   }
 
   W <- as.matrix(W)
-  colnames(W) <- .setColnames(colnames(W), NCOL(W), "W")
+  colnames(W) <- .setColnames.jn(colnames(W), NCOL(W), "W")
 
   if(identical (family, stats::binomial)){
     family <- "binomial"
   } else if (identical(family, stats::gaussian)){
     family <- "gaussian"
   }
-  if(!.verifyArgs(Y,Z=NULL,A,cbind(V,W,T),Delta, Qform, gform, hAVform, g.Deltaform)){
+  if(!.verifyArgs.jn(Y,Z=NULL,A,cbind(V,W,T),Delta, Qform, gform, hAVform, g.Deltaform)){
     stop()
   }
   maptoYstar <- fluctuation=="logistic" | family=="binomial"
 
   #---- Stage 1 -----
-  stage1 <- .initStage1(Y=Y,A=A, Q=Q, Delta=Delta, Qbounds=Qbounds, alpha=alpha, maptoYstar=maptoYstar, family=family)
-  Qinit <- suppressWarnings(estimateQ(Y=stage1$Ystar,Z=rep(1, length(Y)), A=A,
+  stage1 <- .initStage1.jn(Y=Y,A=A, Q=Q, Delta=Delta, Qbounds=Qbounds, alpha=alpha, maptoYstar=maptoYstar, family=family)
+  Qinit <- suppressWarnings(estimateQ.jn(Y=stage1$Ystar,Z=rep(1, length(Y)), A=A,
                                       W=cbind(W,V,T), Delta=(I.V==1 & Delta==1),
                                       Q=stage1$Q, Qbounds=stage1$Qbounds, Qform=Qform, maptoYstar = maptoYstar,
                                       SL.library=Q.SL.library, cvQinit=cvQinit, family=family, id=id, V = V_SL, verbose=verbose))
 
   #---- Stage 2 -----
   if(is.null(hAV)){
-    gAV <- suppressWarnings(estimateG(d=data.frame(A,V,T), hAV, hAVform,g.SL.library, id, V=V_SL, verbose,
+    gAV <- suppressWarnings(estimateG.jn(d=data.frame(A,V,T), hAV, hAVform,g.SL.library, id, V=V_SL, verbose,
                                       message="h(A,V)", outcome="A"))
     hAV <- cbind((1-A)*(1-gAV$g1W) + A*gAV$g1W, 1-gAV$g1W, gAV$g1W)
   } else {
@@ -190,17 +196,17 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   }
   colnames(hAV) <- c("hAV", "h0V", "h1V")
   if (is.null(v)){
-    g <- suppressWarnings(estimateG(d=data.frame(A,V,W,T), g1W, gform,g.SL.library, id, V=V_SL, verbose,
+    g <- suppressWarnings(estimateG.jn(d=data.frame(A,V,W,T), g1W, gform,g.SL.library, id, V=V_SL, verbose,
                                     message="treatment mechanism", outcome="A"))
   } else {
-    g <- suppressWarnings(estimateG(d=data.frame(A,V,W,T), g1W, gform,g.SL.library, id, V=V_SL, verbose,
+    g <- suppressWarnings(estimateG.jn(d=data.frame(A,V,W,T), g1W, gform,g.SL.library, id, V=V_SL, verbose,
                                     message="treatment mechanism", outcome="A", newdata=data.frame(A,V=v, W,T)))
   }
   g$bound <- c(0,ub)
   if(g$type=="try-error"){
     stop("Error estimating treatment mechanism (hint: only numeric variables are allowed)")
   }
-  g.Delta <- estimateG(d=data.frame(Delta, Z=1, A, W,V,T), pDelta1, g.Deltaform,
+  g.Delta <- estimateG.jn(d=data.frame(Delta, Z=1, A, W,V,T), pDelta1, g.Deltaform,
                        g.SL.library,id=id, V = V_SL, verbose, "missingness mechanism", outcome="D")
   g1VW <- g$g1W * g.Delta$g1W[,"Z0A1"]
   g0VW <- (1-g$g1W) * g.Delta$g1W[,"Z0A0"]
@@ -217,13 +223,13 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   covar.MSMA1 <- stats::model.matrix(MSMformula, mf1)
 
   if(verbose){cat("\tTargeting Q\n")}
-  C1 <- I.V * .bound(hAV[,"hAV"]/gAVW, c(0,ub)) * covar.MSM
+  C1 <- I.V * .bound.jn(hAV[,"hAV"]/gAVW, c(0,ub)) * covar.MSM
   suppressWarnings(
     epsilon <- stats::coef(stats::glm(stage1$Ystar ~ -1 + offset(Qinit$Q[,"QAW"]) + C1, subset=(I.V==1 & Delta==1), family=Qinit$family))
   )
   Qstar <- cbind(Qinit$Q[,"QAW"] + C1 %*% epsilon,
-                 Qinit$Q[,"Q0W"] + .bound(hAV[,"h0V"]/g0VW, c(0,ub)) * covar.MSMA0 %*% epsilon,
-                 Qinit$Q[,"Q1W"] + .bound(hAV[,"h1V"]/g1VW, c(0,ub)) * covar.MSMA1 %*% epsilon)
+                 Qinit$Q[,"Q0W"] + .bound.jn(hAV[,"h0V"]/g0VW, c(0,ub)) * covar.MSMA0 %*% epsilon,
+                 Qinit$Q[,"Q1W"] + .bound.jn(hAV[,"h1V"]/g1VW, c(0,ub)) * covar.MSMA1 %*% epsilon)
   if(identical(Qinit$family, "binomial")){
     Qstar <- stats::plogis(Qstar)*diff(stage1$ab)+stage1$ab[1]
     Qinit$Q <- stats::plogis(Qinit$Q)*diff(stage1$ab)+stage1$ab[1]
@@ -253,7 +259,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
     }
     colnames(mAV) <- c("m0V", "m1V")
 
-    sigma <- calcSigma(hAV, gAVW, Y, Qstar, mAV, covar.MSM, covar.MSMA0, covar.MSMA1, I.V, Delta, ub, id, family,
+    sigma <- calcSigma.jn(hAV, gAVW, Y, Qstar, mAV, covar.MSM, covar.MSMA0, covar.MSMA1, I.V, Delta, ub, id, family,
                        return_IC = ret_IC)
     if(ret_IC){
       IC <- sigma$IC
@@ -277,7 +283,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 
 
 
-#---------- function .setColnames ---------------
+#---------- function .setColnames.jn ---------------
 # assign names to every unnamed column of x
 # arguments
 # 	x.colnames - current column names
@@ -285,7 +291,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 # 	firstChar - prefix for internally assigned name
 # return the names
 #-----------------------------------------
-.setColnames <- function(x.colnames, x.ncols, firstChar){
+.setColnames.jn <- function(x.colnames, x.ncols, firstChar){
   if(is.null(x.colnames)) {
     if(x.ncols > 1){
       x.colnames <- paste(firstChar,1:x.ncols, sep="")
@@ -304,7 +310,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 #-------------.verifyArgs------------------
 # initial checks on data passed in
 #-------------------------------------------
-.verifyArgs <- function(Y,Z,A,W,Delta, Qform, gform, g.Zform,g.Deltaform){
+.verifyArgs.jn <- function(Y,Z,A,W,Delta, Qform, gform, g.Zform,g.Deltaform){
   formulas <- list(Qform, gform, g.Zform, g.Deltaform)
   validFormula <- sapply(formulas, function(x){identical(class(try(stats::as.formula(x))), "formula")})
   validNames <- c("Y", "Z", "A", ".", "Delta", colnames(W))
@@ -340,7 +346,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 }
 
 
-#---------- function .initStage1 ---------------
+#---------- function .initStage1.jn ---------------
 # Bound Y, map to Ystar if applicable, and
 # set boundson on Q and enforce on user-specified values
 # returns
@@ -351,7 +357,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 #			(-Inf,+Inf) is default for linear regression
 #   ab - bounding levels used to transform Y to Ystar
 #-----------------------------------------------
-.initStage1 <- function(Y,A, Q, Q.Z1=NULL, Delta, Qbounds, alpha, maptoYstar, family){
+.initStage1.jn <- function(Y,A, Q, Q.Z1=NULL, Delta, Qbounds, alpha, maptoYstar, family){
   if(family=="binomial") {Qbounds <- c(0,1)}
   if(is.null(Qbounds)) {
     if(maptoYstar){
@@ -371,9 +377,9 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   ab <- c(0,1)
   Ystar <- Y
   if(maptoYstar){
-    Ystar <- .bound(Y, Qbounds)
+    Ystar <- .bound.jn(Y, Qbounds)
     if(!is.null(Q)){
-      Q <- .bound(Q, Qbounds)
+      Q <- .bound.jn(Q, Qbounds)
     }
     if(0 >= alpha | 1 <= alpha){
       alpha <- .995
@@ -393,7 +399,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 # set outliers to min/max allowable values
 # assumes x contains only numerical data
 #-----------------------------------------
-.bound <- function(x, bounds){
+.bound.jn <- function(x, bounds){
   x[x>max(bounds)] <- max(bounds)
   x[x<min(bounds)] <- min(bounds)
   return(x)
@@ -428,7 +434,7 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
 #		coef, NA, unless Q is estimated using a parametric model
 # 		type, estimation method for Q
 #----------------------------------------
-estimateQ <- function (Y,Z,A,W, Delta, Q, Qbounds, Qform, maptoYstar,
+estimateQ.jn <- function (Y,Z,A,W, Delta, Q, Qbounds, Qform, maptoYstar,
                        SL.library, cvQinit, family, id, V, verbose) {
   SL.version <- 2
   Qfamily <- family
@@ -458,7 +464,7 @@ estimateQ <- function (Y,Z,A,W, Delta, Q, Qbounds, Qform, maptoYstar,
       type="glm, user-supplied model"
     } else {
       if(cvQinit){
-        m <- try(estQcvSL(Y,X=cbind(Z,A,W),SL.library, family=family,
+        m <- try(estQcvSL.jn(Y,X=cbind(Z,A,W),SL.library, family=family,
                            Delta=Delta, Qbounds=Qbounds,id=id, V_SL = V, verbose=verbose))
         if(!(identical(class(m), "try-error"))){
           type <- "cross-validated SL"
@@ -514,7 +520,7 @@ estimateQ <- function (Y,Z,A,W, Delta, Q, Qbounds, Qform, maptoYstar,
     coef <- stats::coef(m)
     type="glm, main terms model"
   }
-  Q <- .bound(Q, Qbounds)
+  Q <- .bound.jn(Q, Qbounds)
   if(maptoYstar | identical(Qfamily,"binomial") | identical(Qfamily, stats::binomial)){
     Q <- stats::qlogis(Q)
     Qfamily <- "binomial"
@@ -537,7 +543,7 @@ estimateQ <- function (Y,Z,A,W, Delta, Q, Qbounds, Qform, maptoYstar,
   return(Qinit)
 }
 
-#-----------estimateG----------------
+#-----------estimateG.jn----------------
 # Estimate factors of g
 # 		P(A=1|W), P(Z=1|A,W), P(Delta=1|Z,A,W)
 # d - dataframe (A,W), (Z,A,W), or (Delta,Z,A,W)
@@ -555,7 +561,7 @@ estimateQ <- function (Y,Z,A,W, Delta, Q, Qbounds, Qform, maptoYstar,
 # d = [Z,A,W] for intermediate
 # d = [Delta, Z,A,W for missingness]
 #----------------------------------------
-estimateG <- function (d,g1W, gform, SL.library, id, V, verbose, message, outcome="A", newdata=d)  {
+estimateG.jn <- function (d,g1W, gform, SL.library, id, V, verbose, message, outcome="A", newdata=d)  {
   SL.version <- 2
   SL.ok <- FALSE
   m <- NULL
@@ -664,8 +670,11 @@ estimateG <- function (d,g1W, gform, SL.library, id, V, verbose, message, outcom
 }
 
 # Computes the variance/covariance matrix for all params in the IC.
-calcSigma <- function(hAV, gAVW, Y, Q, mAV, covar.MSM, covar.MSMA0, covar.MSMA1, I.V, Delta, ub, id, family, return_IC = FALSE){
-  D <- I.V * Delta * ( .bound(hAV[,"hAV"]/gAVW, c(0, ub)) * (Y-Q[,"QAW"]) * covar.MSM
+calcSigma.jn <- function(hAV, gAVW, Y, Q, mAV, covar.MSM, covar.MSMA0,
+                         covar.MSMA1, I.V, Delta, ub, id, family,
+                         return_IC = FALSE){
+  D <- I.V * Delta * ( .bound.jn(hAV[,"hAV"]/gAVW,
+                                 c(0, ub)) * (Y-Q[,"QAW"]) * covar.MSM
                        + hAV[,"h0V"] * (Q[,"Q0W"] - mAV[,"m0V"]) * covar.MSMA0
                        + hAV[,"h1V"] * (Q[,"Q1W"] - mAV[,"m1V"]) * covar.MSMA1)
   if(!any(is.na(D))){
@@ -673,12 +682,15 @@ calcSigma <- function(hAV, gAVW, Y, Q, mAV, covar.MSM, covar.MSMA0, covar.MSMA1,
     nterms <- ncol(covar.MSMA0)
     f <- function(x){x[1:nterms] %*% t(x[(nterms+1):(2*nterms)])}
     if(family == "binomial"){
-      derivFactor <- cbind(mAV[,"m0V"] * (1-mAV[,"m0V"]), mAV[,"m1V"] * (1-mAV[,"m1V"]))
+      derivFactor <- cbind(mAV[,"m0V"] * (1-mAV[,"m0V"]),
+                           mAV[,"m1V"] * (1-mAV[,"m1V"]))
     } else {
       derivFactor <- matrix(1, nrow=nrow(mAV), ncol = 2)
     }
-    deriv.term2 <-  apply(cbind(-hAV[,"h0V"]* I.V * derivFactor[,1] * covar.MSMA0, covar.MSMA0), 1, f)
-    deriv.term3 <-  apply(cbind(-hAV[,"h1V"]* I.V * derivFactor[,2] * covar.MSMA1, covar.MSMA1), 1, f)
+    deriv.term2 <-  apply(cbind(-hAV[,"h0V"]* I.V * derivFactor[,1] *
+                                  covar.MSMA0, covar.MSMA0), 1, f)
+    deriv.term3 <-  apply(cbind(-hAV[,"h1V"]* I.V * derivFactor[,2] *
+                                  covar.MSMA1, covar.MSMA1), 1, f)
     ddpsi.D <- as.matrix(deriv.term2 + deriv.term3)
     M <- -matrix(rowMeans(ddpsi.D), nrow=nterms)
 
@@ -690,7 +702,8 @@ calcSigma <- function(hAV, gAVW, Y, Q, mAV, covar.MSM, covar.MSMA0, covar.MSMA1,
     } else {
       Dstar <- t(Minv %*% t(D))
       if(length(unique(id)) < length(Y)){
-        Dstar <- matrix(unlist(by(Dstar, id, colMeans, simplify=TRUE)), byrow=TRUE, nrow=length(unique(id)))
+        Dstar <- matrix(unlist(by(Dstar, id, colMeans, simplify=TRUE)),
+                        byrow=TRUE, nrow=length(unique(id)))
       }
       ## Place One
       IC <- Dstar
@@ -698,7 +711,7 @@ calcSigma <- function(hAV, gAVW, Y, Q, mAV, covar.MSM, covar.MSMA0, covar.MSMA1,
     }
     rownames(sigma) <- colnames(sigma) <- colnames(covar.MSMA0)
   } else {
-    D <- .bound(hAV[,"hAV"]/gAVW, c(0, ub)) * (Y-Q[,"QAW"]) * covar.MSM
+    D <- .bound.jn(hAV[,"hAV"]/gAVW, c(0, ub)) * (Y-Q[,"QAW"]) * covar.MSM
     term2 <-  hAV[,"h0V"]* (Q[,"Q0W"] - mAV[,"m0V"]) * covar.MSMA0
     term3 <- hAV[,"h1V"]* (Q[,"Q1W"] - mAV[,"m1V"]) * covar.MSMA1
     if (!any(is.na(term2))){D <- D + term2}
@@ -714,7 +727,8 @@ calcSigma <- function(hAV, gAVW, Y, Q, mAV, covar.MSM, covar.MSMA0, covar.MSMA1,
   }
 }
 
-my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM, v=NULL,
+my_tmleMSM.jn <- function(Y,A,W,V,T=rep(1,length(Y)),
+                          Delta=rep(1, length(Y)), MSM, v=NULL,
                        Q=NULL, Qform=NULL,
                        Qbounds=c(-Inf, Inf),
                        Q.SL.library=c("SL.glm"),
@@ -724,7 +738,8 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
                        pDelta1=NULL, g.Deltaform=NULL,
                        g.SL.library=c("SL.glm"), ub = 1/0.025,
                        family="gaussian", fluctuation="logistic", alpha  = 0.995,
-                       id=1:length(Y), V_SL=5, inference=TRUE, verbose=FALSE, ret_IC = TRUE) {
+                       id=1:length(Y), V_SL=5, inference=TRUE,
+                       verbose=FALSE, ret_IC = TRUE) {
   Y[is.na(Y)] <- 0
   n <- length(Y)
   n.id <- length(unique(id))
@@ -734,36 +749,42 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
     I.V <- as.numeric(V==v)
   }
   V <- as.matrix(V)
-  colnames(V) <- .setColnames(colnames(V), NCOL(V), "V")
+  colnames(V) <- .setColnames.jn(colnames(V), NCOL(V), "V")
 
   if (sum(!sapply(W, is.numeric)) > 0) {
     stop("Currently, only numeric variables are allowed.  Please convert any character or factor variables to numeric.")
   }
 
   W <- as.matrix(W)
-  colnames(W) <- .setColnames(colnames(W), NCOL(W), "W")
+  colnames(W) <- .setColnames.jn(colnames(W), NCOL(W), "W")
 
   if(identical (family, stats::binomial)){
     family <- "binomial"
   } else if (identical(family, stats::gaussian)){
     family <- "gaussian"
   }
-  if(!.verifyArgs(Y,Z=NULL,A,cbind(V,W,T),Delta, Qform, gform, hAVform, g.Deltaform)){
+  if(!.verifyArgs.jn(Y,Z=NULL,A,cbind(V,W,T),Delta, Qform,
+                     gform, hAVform, g.Deltaform)){
     stop()
   }
   maptoYstar <- fluctuation=="logistic" | family=="binomial"
 
   #---- Stage 1 -----
-  stage1 <- .initStage1(Y=Y,A=A, Q=Q, Delta=Delta, Qbounds=Qbounds, alpha=alpha, maptoYstar=maptoYstar, family=family)
-  Qinit <- suppressWarnings(estimateQ(Y=stage1$Ystar,Z=rep(1, length(Y)), A=A,
-                                      W=cbind(W,V,T), Delta=(I.V==1 & Delta==1),
-                                      Q=stage1$Q, Qbounds=stage1$Qbounds, Qform=Qform, maptoYstar = maptoYstar,
-                                      SL.library=Q.SL.library, cvQinit=cvQinit, family=family, id=id, V = V_SL, verbose=verbose))
+  stage1 <- .initStage1.jn(Y=Y,A=A, Q=Q, Delta=Delta, Qbounds=Qbounds,
+                           alpha=alpha, maptoYstar=maptoYstar, family=family)
+  Qinit <- suppressWarnings(estimateQ.jn(
+    Y=stage1$Ystar,Z=rep(1, length(Y)), A=A,
+    W=cbind(W,V,T), Delta=(I.V==1 & Delta==1),
+    Q=stage1$Q, Qbounds=stage1$Qbounds, Qform=Qform, maptoYstar = maptoYstar,
+    SL.library=Q.SL.library, cvQinit=cvQinit, family=family,
+    id=id, V = V_SL, verbose=verbose)
+    )
 
   #---- Stage 2 -----
   if(is.null(hAV)){
-    gAV <- suppressWarnings(estimateG(d=data.frame(A,V,T), hAV, hAVform,g.SL.library, id, V=V_SL, verbose,
-                                      message="h(A,V)", outcome="A"))
+    gAV <- suppressWarnings(estimateG.jn(
+      d=data.frame(A,V,T), hAV, hAVform,g.SL.library, id, V=V_SL, verbose,
+      message="h(A,V)", outcome="A"))
     hAV <- cbind((1-A)*(1-gAV$g1W) + A*gAV$g1W, 1-gAV$g1W, gAV$g1W)
   } else {
     hAV <- cbind((1-A)*(hAV[,1]) + A*hAV[,2], hAV)
@@ -774,18 +795,24 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   }
   colnames(hAV) <- c("hAV", "h0V", "h1V")
   if (is.null(v)){
-    g <- suppressWarnings(estimateG(d=data.frame(A,V,W,T), g1W, gform,g.SL.library, id, V=V_SL, verbose,
-                                    message="treatment mechanism", outcome="A"))
+    g <- suppressWarnings(estimateG.jn(
+      d=data.frame(A,V,W,T), g1W, gform,
+      g.SL.library, id, V=V_SL, verbose,
+      message="treatment mechanism", outcome="A"))
   } else {
-    g <- suppressWarnings(estimateG(d=data.frame(A,V,W,T), g1W, gform,g.SL.library, id, V=V_SL, verbose,
-                                    message="treatment mechanism", outcome="A", newdata=data.frame(A,V=v, W,T)))
+    g <- suppressWarnings(estimateG.jn(
+      d=data.frame(A,V,W,T), g1W, gform,g.SL.library, id, V=V_SL, verbose,
+      message="treatment mechanism", outcome="A",
+      newdata=data.frame(A,V=v, W,T)))
   }
   g$bound <- c(0,ub)
   if(g$type=="try-error"){
     stop("Error estimating treatment mechanism (hint: only numeric variables are allowed)")
   }
-  g.Delta <- estimateG(d=data.frame(Delta, Z=1, A, W,V,T), pDelta1, g.Deltaform,
-                       g.SL.library,id=id, V = V_SL, verbose, "missingness mechanism", outcome="D")
+  g.Delta <- estimateG.jn(d=data.frame(Delta, Z=1, A, W,V,T),
+                          pDelta1, g.Deltaform,
+                          g.SL.library,id=id, V = V_SL, verbose,
+                          "missingness mechanism", outcome="D")
   g1VW <- g$g1W * g.Delta$g1W[,"Z0A1"]
   g0VW <- (1-g$g1W) * g.Delta$g1W[,"Z0A0"]
   gAVW <- A*g1VW + (1-A)*g0VW
@@ -801,13 +828,19 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   covar.MSMA1 <- stats::model.matrix(MSMformula, mf1)
 
   if(verbose){cat("\tTargeting Q\n")}
-  C1 <- I.V * .bound(hAV[,"hAV"]/gAVW, c(0,ub)) * covar.MSM
+  C1 <- I.V * .bound.jn(hAV[,"hAV"]/gAVW, c(0,ub)) * covar.MSM
   suppressWarnings(
-    epsilon <- stats::coef(stats::glm(stage1$Ystar ~ -1 + offset(Qinit$Q[,"QAW"]) + C1, subset=(I.V==1 & Delta==1), family=Qinit$family))
+    epsilon <- stats::coef(stats::glm(
+      stage1$Ystar ~ -1 + offset(Qinit$Q[,"QAW"]) + C1,
+      subset=(I.V==1 & Delta==1), family=Qinit$family))
   )
   Qstar <- cbind(Qinit$Q[,"QAW"] + C1 %*% epsilon,
-                 Qinit$Q[,"Q0W"] + .bound(hAV[,"h0V"]/g0VW, c(0,ub)) * covar.MSMA0 %*% epsilon,
-                 Qinit$Q[,"Q1W"] + .bound(hAV[,"h1V"]/g1VW, c(0,ub)) * covar.MSMA1 %*% epsilon)
+                 Qinit$Q[,"Q0W"] +
+                   .bound.jn(hAV[,"h0V"]/g0VW, c(0,ub)) *
+                   covar.MSMA0 %*% epsilon,
+                 Qinit$Q[,"Q1W"] +
+                   .bound.jn(hAV[,"h1V"]/g1VW, c(0,ub)) *
+                   covar.MSMA1 %*% epsilon)
   if(identical(Qinit$family, "binomial")){
     Qstar <- stats::plogis(Qstar)*diff(stage1$ab)+stage1$ab[1]
     Qinit$Q <- stats::plogis(Qinit$Q)*diff(stage1$ab)+stage1$ab[1]
@@ -825,7 +858,8 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   )
   d.Qinit <- replace(d.Qstar,1, c(Qinit$Q[,"Q0W"], Qinit$Q[,"Q1W"]))
   suppressWarnings(
-    psi.Qinit <- stats::coef(stats::glm(MSMformula, data=d.Qinit, weights=d.Qinit$wts, family=family))
+    psi.Qinit <- stats::coef(stats::glm(MSMformula, data=d.Qinit,
+                                        weights=d.Qinit$wts, family=family))
   )
 
   if(inference){
@@ -836,8 +870,9 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
       mAV <- cbind(covar.MSMA0 %*% psi.Qstar, covar.MSMA1 %*% psi.Qstar)
     }
     colnames(mAV) <- c("m0V", "m1V")
-    sigma <- calcSigma(hAV, gAVW, Y, Qstar, mAV, covar.MSM, covar.MSMA0, covar.MSMA1, I.V, Delta, ub, id, family,
-                       return_IC = ret_IC)
+    sigma <- calcSigma.jn(hAV, gAVW, Y, Qstar, mAV, covar.MSM, covar.MSMA0,
+                          covar.MSMA1, I.V, Delta, ub, id, family,
+                          return_IC = ret_IC)
     if(ret_IC){
       IC <- sigma$IC
       sigma <- sigma$sigma/n.id
@@ -854,19 +889,17 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   }
   Qinit$Q <- Qinit$Q[,-1]
   if(ret_IC){
-    returnVal <- list(psi=psi.Qstar, sigma=sigma,se=se, pvalue=pvalue, lb=lb, ub=ub, epsilon=epsilon,  psi.Qinit=psi.Qinit,  Qstar=Qstar[,-1], Qinit=Qinit, g=g, g.AV=gAV, g.Delta=g.Delta, IC=IC)
+    returnVal <- list(psi=psi.Qstar, sigma=sigma,se=se, pvalue=pvalue,
+                      lb=lb, ub=ub, epsilon=epsilon,  psi.Qinit=psi.Qinit,
+                      Qstar=Qstar[,-1], Qinit=Qinit, g=g,
+                      g.AV=gAV, g.Delta=g.Delta, IC=IC)
   }else{
-    returnVal <- list(psi=psi.Qstar, sigma=sigma,se=se, pvalue=pvalue, lb=lb, ub=ub, epsilon=epsilon,  psi.Qinit=psi.Qinit,  Qstar=Qstar[,-1], Qinit=Qinit, g=g, g.AV=gAV, g.Delta=g.Delta)
+    returnVal <- list(psi=psi.Qstar, sigma=sigma,se=se, pvalue=pvalue,
+                      lb=lb, ub=ub, epsilon=epsilon,  psi.Qinit=psi.Qinit,
+                      Qstar=Qstar[,-1], Qinit=Qinit, g=g,
+                      g.AV=gAV, g.Delta=g.Delta)
   }
   class(returnVal) <- "tmleMSM"
   return(returnVal)
-}
-
-
-de_3_jn <- function(est_or_IC){
-  if(est_or_IC == "est"){return(de3_est_jn)}
-  if(est_or_IC == "IC"){return(de3_ic_jn)}
-  else{stop("You must specify if you want the estimate of the parameter (est),
-            or the influence curve (IC)")}
 }
 

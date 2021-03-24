@@ -1,41 +1,52 @@
-de3_ic <- function(obs_data){
+#' Estimate both the parameter, and the influence
+#' curves used for estimating the projected risk ratio.
+#' These functions will be given an entire dataset, and will
+#' return the estimate for the parameter, and for each
+#' estimated influence curve at each observation. The first column
+#' of your data should correspond to the variable of interest
+#' (the variable for which pearson correlation is calculated).
+#'
+#' Obtain an estimator of the probability delta = 1 given w
+#' @param obs_data the observed data.  The first column should be the outcome.
+#' @param what the desired return value. Should be one of `"ic"`
+#' (infludence curve), `"est"` (estimate), or `"both"`.
+#' @param control any other control parameters to be passed to the estimator.
+#'
+#' @export
+
+rr.msm.ic <- function(obs_data, what = "both", control = NULL){
+  if (!(what %in% c("ic", "est", "both"))) {
+    stop("what must be one of ic (influence curve), est (estimate), or both")
+  }
+  ret <- list()
   w_covs <- which(!colnames(obs_data) %in% c("y", "a"))
   fin_IC <- matrix(NA, nrow = nrow(obs_data),
                    ncol = ncol(obs_data) - 2)
-  for(cov_idx in 1:length(w_covs)){
+  psi_hat <- rep(NA, length(w_covs))
+  w_covs <- which(!colnames(obs_data) %in% c("y", "a"))
+  fin_IC <- matrix(NA, nrow = nrow(obs_data),
+                   ncol = ncol(obs_data) - 2)
+  for (cov_idx in 1:length(w_covs)) {
     cov_IC <- my_tmleMSM(Y = obs_data$y,
                          V = obs_data[, w_covs[cov_idx]],
                          A = obs_data$a,
                          W = obs_data[, w_covs[-cov_idx]],
                          MSM = "A*V", gform = A~1,
-                         hAVform = A~1, family = "binomial",
                          g.SL.library = NULL,
                          Q.SL.library = list(#"SL.glm",
                            c("SL.glmnet", "screen.glmnet")),
+                         hAVform = A~1, family = "binomial",
                          ret_IC = TRUE)
     fin_IC[, cov_idx] <- cov_IC$IC[, 4]
-  }
-  return(fin_IC)
-}
-
-de3_est <- function(obs_data){
-  w_covs <- which(!colnames(obs_data) %in% c("y", "a", "v"))
-  psi_hat <- rep(NA, length(w_covs))
-  for(cov_idx in 1:length(w_covs)){
-    cov_IC <- my_tmleMSM(Y = obs_data$y,
-                         V = obs_data[, w_covs[cov_idx]],
-                         A = obs_data$a,
-                         W = obs_data[, w_covs[-cov_idx]],
-                         MSM = "A*V", Qform = Y~., gform = A~1,
-                         g.SL.library = NULL,
-                         Q.SL.library = list(#"SL.glm",
-                           c("SL.glmnet", "screen.glmnet")),
-                         hAVform = A~1, family = "binomial",
-                         ret_IC = FALSE,
-                         inference = FALSE)
     psi_hat[cov_idx] <- cov_IC$psi[4]
   }
-  return(psi_hat)
+  if (what %in% c("both", "est")) {
+    ret$est <- psi_hat
+  }
+  if (what %in% c("both", "ic")) {
+    ret$ic <- fin_IC
+  }
+  return(ret)
 }
 
 #----- function estQcvSL ----
@@ -857,13 +868,5 @@ my_tmleMSM <- function(Y,A,W,V,T=rep(1,length(Y)), Delta=rep(1, length(Y)), MSM,
   }
   class(returnVal) <- "tmleMSM"
   return(returnVal)
-}
-
-
-de_3 <- function(est_or_IC){
-  if(est_or_IC == "est"){return(de3_est)}
-  if(est_or_IC == "IC"){return(de3_ic)}
-  else{stop("You must specify if you want the estimate of the parameter (est),
-            or the influence curve (IC)")}
 }
 

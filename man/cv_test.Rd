@@ -5,68 +5,18 @@
 \title{CV-test runs a cross-validation, parametric bootstrap test. This function returns
 an approximate p-value for the specified test statistic.}
 \usage{
-cv_test(
-  obs_data,
-  param,
-  pos_lp_norms,
-  num_folds,
-  f_cv_summary = mean,
-  n_bs_smp,
-  nrm_type = "lp",
-  test_stat_func,
-  ts_ld_bs_samp = 250,
-  big_train = TRUE,
-  more_info = NULL,
-  show_hist = FALSE,
-  test_type = "par_boot",
-  perf_meas = "est_pow",
-  nrmlize = FALSE
-)
+cv_test(obs_data, param_est = NULL, control = test.control())
 }
 \arguments{
-\item{obs_data}{The observed data to be used for finding the optimal norm (training),
-and finding the test statistic (testing).  Similar to above, each row is an observation and each
-column corresponds to either the outcome (first column) or a covariate.}
+\item{obs_data}{The observed data to be used for finding the optimal
+norm (training), and finding the test statistic (testing).  Similar to
+above, each row is an observation and each column corresponds to either
+the outcome (first column) or a covariate.}
 
-\item{param}{parameter of interest.}
+\item{param_est}{Function used to estimate the parameter and corresponding
+influence curve.}
 
-\item{pos_lp_norms}{The index of the norms to be considered.  For example if we use the l_p norm,
-norms_indx specifies the different p's to try.}
-
-\item{num_folds}{The number of folds to be used in the cross-validation proceedure.  If set to 1,
-no cross validation will be used.}
-
-\item{f_cv_summary}{How test statistics from different folds are combined to create an overall
-test statistic.  Usually the mean is used.}
-
-\item{n_bs_smp}{Number of samples to be used in estimating the limiting distribution of the
-test statistic under the null.}
-
-\item{nrm_type}{The type of norm to be used for the test.  Generally the l_p norm}
-
-\item{test_stat_func}{A function that will provide the test statistic for the
-given fold (using the testing data), and uses the best
-norm (decided on using the training data).}
-
-\item{ts_ld_bs_samp}{The number of test statisitic limiting distribution bootstrap samples to be
-drawn.}
-
-\item{big_train}{Data is split into splits of roughly equal sizes. The number of splits is equal
-to num_folds. If big_train is TRUE then all but one of these splits will be training data,
-if big_train is FALSE all but one will be testing data.}
-
-\item{more_info}{Boolean indicating if the test schould return more information that just
-the p-value.  When true, the chosen norm index, the bonferroni based p-value, the test statistic,
-and the estimated distribution of the test statistic will be returned.}
-
-\item{show_hist}{set to True if you would like to see a histogram of the test statistic's
-limiting distribution bootstrap draws compared to the estimated parameter.}
-
-\item{test_type}{parametric bootstrap or permutation (permutation works better for small sample sizes)}
-
-\item{perf_meas}{the prefered measure used to generate the test statistic.}
-
-\item{nrmlize}{Boolean for if the estimator should be normalized to have a limiting distribution with identity covaraince matrix.}
+\item{control}{List used to define controls for test.}
 }
 \value{
 learned test statistic for a single fold of data

@@ -9,7 +9,7 @@ also ouput the chosen norm index chosen using the training set.}
 one_fold_est(
   lm_dst_est,
   obs_data,
-  est_func,
+  param_est,
   test_stat_func = l_p_norm,
   perf_meas,
   trn_indx,
@@ -26,7 +26,7 @@ observation, and each column corresponds to a parameter.}
 and finding the test statistic (testing).  Similar to above, each row is an observation and each
 column corresponds to either the outcome (first column) or a covariate.}
 
-\item{est_func}{A function that will provide the vector of parameter estimates for a subset of
+\item{param_est}{A function that will provide the vector of parameter estimates for a subset of
 obs_data.}
 
 \item{test_stat_func}{A function that will provide the test statistic for the

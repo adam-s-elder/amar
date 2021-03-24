@@ -24,12 +24,14 @@ cel_test <- function(obs_data, lp_norm = "ap", as_meas,
                      num_boot = 1000, pos_lp = c(2, "max"),
                      fixed = "power", cmp_meas = "mean"){
   num_obs   <- nrow(obs_data)
-  est_param <- est_pearson(obs_data)
-  est_cov   <- est_influence_pearson(obs_data)
+  ic_and_est <- ic.pearson(obs_data, what = "both")
+  est_param <- ic_and_est$est
+  est_cov   <- ic_and_est$ic
   norm_mat  <- matrix(stats::rnorm(num_boot * nrow(est_cov)), nrow = num_boot)
   e_lm_dstr <- gen_boot_sample(norm_mat, est_cov, center = TRUE, rate = "rootn")
-  if (lp_norm == "ap"){
-    lp_v <- select_lp(e_lm_dstr, pos_lp, fxd_val = fixed, compare_measure = cmp_meas)
+  if (lp_norm == "ap") {
+    lp_v <- select_lp(e_lm_dstr, pos_lp, fxd_val = fixed,
+                      compare_measure = cmp_meas)
   }else{
     lp_v <- lp_norm
   }
