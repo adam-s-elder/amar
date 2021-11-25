@@ -32,30 +32,30 @@
 #'
 #' @export
 
-calc_test_stat <- function(lm_dst_est, obs_data, est_func, test_stat_func = l_p_norm,
-                         perf_meas, null_quants, norms_indx, norm_type,
-                         in_sq_mat = NULL){
+calc_test_stat <- function(lm_dst_est, obs_data, est_func,
+                           test_stat_func = l_p_norm,
+                           perf_meas, null_quants, norms_indx,
+                           norm_type, in_sq_mat = NULL){
   n_obs <- nrow(obs_data)
-  if(is.null(in_sq_mat)){
+  if (is.null(in_sq_mat)) {
     par_est  <- sqrt(nrow(obs_data)) * as.vector(est_func(obs_data))
   }else{
     par_est <- sqrt(nrow(obs_data)) * in_sq_mat %*% as.vector(est_func(obs_data))
     par_est <- as.vector(par_est)
   }
-  if(perf_meas == "est_pow"){
+  if (perf_meas == "est_pow") {
     performs <- pow_for_mag(boot_data = lm_dst_est, dir =  par_est,
                             nrm_type = norm_type, lp = norms_indx,
                             nf_quants = null_quants)
     best_norm <- norms_indx[which.max(performs)]
-  }else if(perf_meas == "pval"){
+  }else if (perf_meas == "pval") {
     performs <- pval_for_mag(boot_data = lm_dst_est, dir = par_est,
                              nrm_type = norm_type, lp = norms_indx)
     best_norm <- norms_indx[which.min(performs)]
-  }else if(perf_meas == "mag"){
+  }else if (perf_meas == "mag") {
     performs <- mag_for_pow(boot_data = lm_dst_est, dir = par_est,
                             lp_nrms = norms_indx, nf_quants = null_quants,
                             nrm_type = norm_type, power = 0.8)
-    #if(rnorm(1) > 3.5){print(performs)}
     best_norm <- norms_indx[which.min(performs)]
   }
   return(c("test_stat" = test_stat_func(par_est, p = best_norm),

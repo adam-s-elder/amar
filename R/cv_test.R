@@ -13,42 +13,39 @@
 #' @export
 
 cv_test <- function(obs_data, param_est = NULL,
-                    control = test.control()){
+                    control = test.control()) {
   ld_est_meth <- control$ld_est_meth
-  if (control$nrm_type == "bonf") {ld_est_meth <- "bonf"}
+  if (control$nrm_type == "bonf") ld_est_meth <- "bonf"
   init_cv_est <- est_cv(obs_data = obs_data, param_est = param_est,
                         control = control, est_lm_distr = NULL,
                         return_lmd = TRUE, view_IC = control$show_hist)
-  e_lm_dstr <- init_cv_est$est_lm_dstr
-  t_s_f <- init_cv_est$t_s_f
   cv_est <- init_cv_est$cv_est
   ic_est <- init_cv_est$ic_est
   param_ests <- init_cv_est$param_ests
   param_sds <- init_cv_est$param_sds
-  num_folds <- control$num_folds
   ts_ld_bs_samp <- control$ts_ld_bs_samp
   oth_ic_info <- init_cv_est$oth_ic
   if (ld_est_meth == "par_boot") {
     if (control$nrmlize) {
       f_e_lm_dstr <- matrix(
-        stats::rnorm(num_folds * ts_ld_bs_samp * ncol(ic_est)),
-        nrow = num_folds * ts_ld_bs_samp)
+        stats::rnorm(ts_ld_bs_samp * ncol(ic_est)),
+        nrow = ts_ld_bs_samp)
     }else{
       sim_ts_mat <- matrix(
-        stats::rnorm(num_folds * ts_ld_bs_samp * nrow(ic_est)),
-        nrow = num_folds * ts_ld_bs_samp)
+        stats::rnorm(ts_ld_bs_samp * nrow(ic_est)),
+        nrow = ts_ld_bs_samp)
       f_e_lm_dstr <- gen_boot_sample(sim_ts_mat, ic_est,
                                      center = TRUE, rate = "rootn")
     }
     ts_lim_dist <- rep(NA, ts_ld_bs_samp)
     for (bs_idx in 1:ts_ld_bs_samp) {
       sub_data <- f_e_lm_dstr[
-        (num_folds * (bs_idx - 1) + 1):(num_folds * bs_idx), , drop = FALSE
+        bs_idx, , drop = FALSE
         ]
       par_boot_cv_est <- est_cv(
         obs_data = sub_data,
         param_est = function(x, ...)list("est" = apply(x, 2, mean)),
-        control = control, est_lm_distr = e_lm_dstr,
+        control = control, est_lm_distr = init_cv_est$est_lm_dstr,
         return_lmd = FALSE)
       ts_lim_dist[bs_idx] <- par_boot_cv_est$cv_est
     }
@@ -67,7 +64,6 @@ cv_test <- function(obs_data, param_est = NULL,
   }else{
     ts_lim_dist <- NULL
   }
-
   if (ld_est_meth == "bonf") {
     zvals <- abs(param_ests) / param_sds
     p_val <- 2 * (1 - stats::pnorm(max(zvals))) * length(zvals)
