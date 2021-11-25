@@ -67,13 +67,9 @@ ic.proj.rr.nolas <-  function(obs_data, what = "both", control = NULL){
     IC[, p_idx] <- Dmat[, , p_idx] %*% t(grad_mat[c_idx, , drop = FALSE])
   }
   if (what %in% c("est", "both")) {
-    ## TODO: Move one-step correction to be inside of this function
-    ## rather than in the code.
-    # one-step correction
-    # os_cor <- as.vector(apply(est_cov, 2, mean))
-    # est <- est + os_cor
-    ret$est <- est
-    # ret$onestep.correction <- os_cor
+    os_cor <- as.vector(apply(IC, 2, mean))
+    ret$est <- os_cor + as.vector(est)
+    ret$onestep.correction <- os_cor
   }
   if (what %in% c("ic", "both")) {
     ret$ic <- IC

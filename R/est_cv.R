@@ -21,10 +21,10 @@ est_cv <- function(obs_data, param_est, control, est_lm_distr = NULL,
   num_folds <- control$num_folds
   n_bs_smp <- control$n_bs_smp
   perf_meas <- control$perf_meas
-  if (!is.null(control$est_lm_distr)) {
+  if (!is.null(est_lm_distr)) {
     e_lm_dstr <- est_lm_distr
   }else{
-    est_and_ic <- param_est(obs_data, what = "both")
+    est_and_ic <- param_est(obs_data, what = "both", control = control)
     ic_est <- est_and_ic$ic
     psi_est <- est_and_ic$est
     if (control$nrmlize) {
@@ -86,20 +86,13 @@ est_cv <- function(obs_data, param_est, control, est_lm_distr = NULL,
     cv_est_idx <- sample(1:num_obs, replace = FALSE)
     if (num_folds == 1) {
       ## If there is more than one row in the observed data object, it is assumed that
-      ## this is the actual observed data.
-      ## If there is only one row, it is assumed that this data is a single draw
-      ## from the estimated limiting disitribution
+      ## this is the actual observed data. If there is only one row,
+      ## it is assumed that this data is a single draw from the estimated
+      ## limiting disitribution
       if (!exists("psi_est")) {psi_est <- param_est(obs_data)$est}
-      if (nrow(obs_data) > 1) {
-        ## Move some of this code inside of the DE2 code.
-        cor_term <- as.vector(apply(ic_est, 2, mean))
-        uncor_term <- as.vector(psi_est)
-        par_est <- sqrt(nrow(obs_data)) * (cor_term + uncor_term)
-        cor_term <- sqrt(nrow(obs_data)) * cor_term
-        if (view_IC) print(look_IC(ic_est))
-      }else{
-        par_est <- sqrt(nrow(obs_data)) *
-          as.vector(psi_est)
+      par_est <- sqrt(nrow(obs_data)) * as.vector(psi_est)
+      if (nrow(obs_data) > 1 & view_IC) {
+         print(look_IC(ic_est))
       }
       if (control$nrmlize & is.null(est_lm_distr)) {
         vcov_mat <- t(ic_est) %*% ic_est / nrow(obs_data)
@@ -145,12 +138,17 @@ est_cv <- function(obs_data, param_est, control, est_lm_distr = NULL,
     param_sds <- apply(
       ic_est, 2, FUN = function(x){sqrt(sum(x ** 2) / length(x))}
       )
-    if (!exists("cor_term")) {cor_term <- NULL}
     if (!exists("psi_est")) {psi_est <- NULL}
+    if (exists("est_and_ic")) {
+      oth_ic_inf <- est_and_ic[setdiff(names(est_and_ic),
+                                       c("est", "ic"))]
+    }else{
+      oth_ic_inf <- NULL
+    }
     return(list("cv_est" = cv_est, "chsn_norms" = chsn_norm,
                 "est_lm_dstr" = e_lm_dstr, "t_s_f" = t_s_f,
                 "ic_est" = ic_est, "param_ests" = psi_est,
-                "param_sds" = param_sds, "correction" = cor_term))
+                "param_sds" = param_sds, "oth_ic" = oth_ic_inf))
   }else{
     return(list("cv_est" = cv_est, "chsn_norms" = chsn_norm))
   }

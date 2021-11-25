@@ -22,9 +22,9 @@ ic.proj.rr <-  function(obs_data, what = "both", control = NULL){
   prob_mis_known <- control$ic_prob_mis_known
   if (is.null(fit_marg)) fit_marg <- FALSE
   if (is.null(fit_jnt)) fit_jnt <- FALSE
-  if (is.null(fit_jnt)) fit_jnt <- FALSE
+  if (is.null(fit_delt)) fit_delt <- FALSE
   if (is.null(prob_mis_known)) prob_mis_known <- FALSE
-  if (prob_mis_known){obs_data$pr_d_mis <- NULL}
+  if (prob_mis_known) {obs_data$pr_d_mis <- NULL}
   if (!is.null(hav_mis_prob)){
     true_mis_prob <- obs_data$pr_d_mis
     obs_data$pr_d_mis <- NULL
@@ -80,13 +80,9 @@ ic.proj.rr <-  function(obs_data, what = "both", control = NULL){
     IC[, p_idx] <- Dmat[, , p_idx] %*% t(grad_mat[c_idx, , drop = FALSE])
   }
   if (what %in% c("est", "both")) {
-    ## TODO: Move one-step correction to be inside of this function
-    ## rather than in the code.
-    # one-step correction
-    # os_cor <- as.vector(apply(IC, 2, mean))
-    # est <- est + os_cor
-    ret$est <- est
-    # ret$onestep.correction <- os_cor
+    os_cor <- as.vector(apply(IC, 2, mean))
+    ret$est <- os_cor + as.vector(est)
+    ret$onestep.correction <- os_cor
   }
   if (what %in% c("ic", "both")) {
     ret$ic <- IC

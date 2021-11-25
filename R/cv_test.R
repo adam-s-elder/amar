@@ -14,8 +14,8 @@
 
 cv_test <- function(obs_data, param_est = NULL,
                     control = test.control()){
-  test_type <- control$test_type
-  if (control$nrm_type == "bonf") {test_type <- "bonf"}
+  ld_est_meth <- control$ld_est_meth
+  if (control$nrm_type == "bonf") {ld_est_meth <- "bonf"}
   init_cv_est <- est_cv(obs_data = obs_data, param_est = param_est,
                         control = control, est_lm_distr = NULL,
                         return_lmd = TRUE, view_IC = control$show_hist)
@@ -25,10 +25,10 @@ cv_test <- function(obs_data, param_est = NULL,
   ic_est <- init_cv_est$ic_est
   param_ests <- init_cv_est$param_ests
   param_sds <- init_cv_est$param_sds
-  one_step_cor <- init_cv_est$correction
   num_folds <- control$num_folds
   ts_ld_bs_samp <- control$ts_ld_bs_samp
-  if (test_type == "par_boot") {
+  oth_ic_info <- init_cv_est$oth_ic
+  if (ld_est_meth == "par_boot") {
     if (control$nrmlize) {
       f_e_lm_dstr <- matrix(
         stats::rnorm(num_folds * ts_ld_bs_samp * ncol(ic_est)),
@@ -47,12 +47,12 @@ cv_test <- function(obs_data, param_est = NULL,
         ]
       par_boot_cv_est <- est_cv(
         obs_data = sub_data,
-        param_est = function(x)list("est" = apply(x, 2, mean)),
+        param_est = function(x, ...)list("est" = apply(x, 2, mean)),
         control = control, est_lm_distr = e_lm_dstr,
         return_lmd = FALSE)
       ts_lim_dist[bs_idx] <- par_boot_cv_est$cv_est
     }
-  }else if (test_type == "perm") {
+  }else if (ld_est_meth == "perm") {
     ts_lim_dist <- rep(NA, ts_ld_bs_samp)
     num_obs <- nrow(obs_data)
     for (perm_idx in seq(ts_ld_bs_samp)) {
@@ -68,7 +68,7 @@ cv_test <- function(obs_data, param_est = NULL,
     ts_lim_dist <- NULL
   }
 
-  if (test_type == "bonf") {
+  if (ld_est_meth == "bonf") {
     zvals <- abs(param_ests) / param_sds
     p_val <- 2 * (1 - stats::pnorm(max(zvals))) * length(zvals)
   }else{
@@ -90,22 +90,16 @@ cv_test <- function(obs_data, param_est = NULL,
     chsn_tbl <- vapply(control$pos_lp_norms,
                        function(x) mean(x == init_cv_est$chsn_norms),
                        FUN.VALUE = -99)
-    if (TRUE) { #more_info == "all"
-      var_mat <- t(ic_est) %*% ic_est / nrow(ic_est)
-    }else{
-      ## Currently waiting to see if this adds too much
-      ## to the list.  May remove
-      var_mat <- NULL
-    }
+    var_mat <- t(ic_est) %*% ic_est / nrow(ic_est)
 
     return(list("pvalue" = p_val,
                 "test_stat" = cv_est,
                 "test_st_eld" = ts_lim_dist,
                 "chosen_norm" = chsn_tbl,
                 "param_ests" = param_ests,
-                "onestep_cor" = one_step_cor,
                 "param_sds" = param_sds,
-                "var_mat" = var_mat
+                "var_mat" = var_mat,
+                "oth_ic_inf" = oth_ic_info
                 ))
   }else{
     return(c("p-value" = p_val))

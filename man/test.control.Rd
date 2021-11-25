@@ -16,7 +16,7 @@ test.control(
   pos_lp_norms = c(1, 2, 3, "max"),
   show_hist = FALSE,
   test_stat_func = mean,
-  test_type = "par_boot",
+  ld_est_meth = "par_boot",
   ts_ld_bs_samp = 250,
   ...
 )
@@ -59,7 +59,8 @@ limiting distribution bootstrap draws compared to the estimated parameter.}
 for the given fold (using the testing data), and uses the best
 norm (decided on using the training data).}
 
-\item{test_type}{parametric bootstrap or permutation (permutation works better for small sample sizes)}
+\item{ld_est_meth}{Method for estimating the limiting distribution of the test statistic
+parametric bootstrap or permutation (permutation works better for small sample sizes)}
 
 \item{ts_ld_bs_samp}{The number of test statisitic limiting distribution bootstrap samples to be
 drawn.}

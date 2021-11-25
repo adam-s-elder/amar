@@ -16,7 +16,7 @@
 #' Generally the l_p norm
 #' @param nrmlize Boolean for if the estimator should be normalized to have
 #' a limiting distribution with identity covaraince matrix.
-#' @param num_folds The number of folds to be used in the cross-validation proceedure.  If set to 1,
+#' @param num_folds The number of folds to be used in the cross-validation procedure.  If set to 1,
 #' no cross validation will be used.
 #' @param perf_meas the prefered measure used to generate the test statistic.
 #' @param pos_lp_norms The index of the norms to be considered.  For example if we use the l_p norm,
@@ -26,9 +26,10 @@
 #' @param test_stat_func A function that will provide the test statistic
 #' for the given fold (using the testing data), and uses the best
 #' norm (decided on using the training data).
-#' @param ts_ld_bs_samp The number of test statisitic limiting distribution bootstrap samples to be
+#' @param ts_ld_bs_samp The number of test statistic limiting distribution bootstrap samples to be
 #' drawn.
-#' @param test_type parametric bootstrap or permutation (permutation works better for small sample sizes)
+#' @param ld_est_meth Method for estimating the limiting distribution of the test statistic
+#' parametric bootstrap or permutation (permutation works better for small sample sizes)
 #' @param ... Other arguments needed in other places.
 #'
 #' @export
@@ -44,8 +45,8 @@ test.control <- function(
   perf_meas = "est_pow",
   pos_lp_norms = c(1, 2, 3, "max"),
   show_hist = FALSE,
-  test_stat_func = mean,
-  test_type = "par_boot",
+  test_stat_func = "mag",
+  ld_est_meth = "par_boot",
   ts_ld_bs_samp = 250, ...
 ){
   formal_args <- formals(sys.function())
