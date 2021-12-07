@@ -1,7 +1,7 @@
 #' Estimate both the parameter, and the influence
 #' curves used for estimating the projected risk ratio. The first column
 #' of your data should correspond to the variable of interest.
-#' 
+#'
 #' @param obs_data the observed data.  The first column should be the outcome.
 #' @param what the desired return value. Should be one of `"ic"`
 #' (infludence curve), `"est"` (estimate), or `"both"`.

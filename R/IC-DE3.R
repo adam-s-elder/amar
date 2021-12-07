@@ -1,11 +1,10 @@
 #' Estimate both the parameter, and the influence
 #' curves used for estimating the projected risk ratio from a working
 #' marginal structural mean model.
-#' 
+#'
 #' The function takes a dataset, and will returns the estimate for the
 #' parameter, and or the estimated influence curve at each observation.
-#' The first column of obs_data should correspond to the variable of interest
-#' (the variable for which pearson correlation is calculated).
+#' The first column of obs_data should be the binary outcome of interest.
 #'
 #' Obtain an estimator of the probability delta = 1 given w
 #' @param obs_data the observed data.  The first column should be the outcome.

@@ -19,8 +19,7 @@ rr.msm.ic(obs_data, what = "both", control = NULL)
 \description{
 The function takes a dataset, and will returns the estimate for the
 parameter, and or the estimated influence curve at each observation.
-The first column of obs_data should correspond to the variable of interest
-(the variable for which pearson correlation is calculated).
+The first column of obs_data should be the binary outcome of interest.
 }
 \details{
 Obtain an estimator of the probability delta = 1 given w
