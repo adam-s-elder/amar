@@ -53,7 +53,7 @@ ic.pearson <- function(observ, what = "both", control = NULL){
 
     ret$ic <- ic
   }
-  if (what %in% c("both", "est") ) {
+  if (what %in% c("both", "est")) {
     ret$est <- stats::cor(observ[, 1], observ[, -1], method = "pearson")
   }
   return(ret)

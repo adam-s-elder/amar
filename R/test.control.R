@@ -13,7 +13,7 @@
 #' we use the l_p norm, norms_indx specifies the different p's to try.
 #' @param show_hist set to True to see a histogram of the test statistic's
 #' limiting distribution MC draws compared to the estimated parameter.
-#' @param ts_ld_bs_samp The number of test statistic limiting distribution 
+#' @param ts_ld_bs_samp The number of test statistic limiting distribution
 #' bootstrap samples to be drawn.
 #' @param ld_est_meth String indicating method for estimating the limiting
 #' distribution of the test statistic parametric bootstrap or permutation.
@@ -22,10 +22,10 @@
 #' @export
 
 test.control <- function(
-  more_info = NULL,
+  more_info = TRUE,
   n_mc_samples = 300, ## RENAME
   nrm_type = "lp",
-  perf_meas = "est_acc", 
+  perf_meas = "est_acc",
   pos_lp_norms = c(1, 2, 3, "max"),
   show_hist = FALSE,
   ld_est_meth = "par_boot",

@@ -22,7 +22,6 @@ mv_pn_test <- function(obs_data, param_est = NULL,
   )
   gam_star_n <- init_est$gam_star_n
   ic_est <- init_est$ic_est
-  param_ests <- init_est$param_ests
   param_ses <- init_est$param_ses
   ts_ld_bs_samp <- control$ts_ld_bs_samp
   oth_ic_info <- init_est$oth_ic
@@ -69,7 +68,7 @@ mv_pn_test <- function(obs_data, param_est = NULL,
                 "test_stat" = gam_star_n,
                 "test_st_eld" = ts_lim_dist,
                 "chosen_norm" = chsn_tbl,
-                "param_ests" = param_ests,
+                "param_ests" = as.vector(init_est$param_ests),
                 "param_ses" = param_ses,
                 "var_mat" = var_mat,
                 "oth_ic_inf" = oth_ic_info

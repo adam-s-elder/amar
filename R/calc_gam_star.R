@@ -53,7 +53,7 @@ calc_gam_star <- function(obs_data, param_est, control,
   chsn_norm <- names(gammas)[which.min(gammas)]
   if (return_lmd) {
     param_ses <- apply(
-      ic_est, 2, FUN = function(x) sqrt(sum(x ** 2) / length(x))
+      ic_est, 2, FUN = function(x) sqrt(mean(x ** 2) / length(x))
       )
     if (exists("est_and_ic")) {
       oth_ic_inf <- est_and_ic[setdiff(names(est_and_ic), c("est", "ic"))]

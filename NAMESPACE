@@ -3,6 +3,7 @@
 export(ZL)
 export(ZL_use_infl)
 export(accept_rate)
+export(add_oth_pvals)
 export(bonf_test)
 export(calc_gam_star)
 export(est_pows)

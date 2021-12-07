@@ -5,7 +5,7 @@
 \title{Control function for the adaptive norm test}
 \usage{
 test.control(
-  more_info = NULL,
+  more_info = TRUE,
   n_mc_samples = 300,
   nrm_type = "lp",
   perf_meas = "est_acc",
@@ -39,7 +39,7 @@ limiting distribution MC draws compared to the estimated parameter.}
 \item{ld_est_meth}{String indicating method for estimating the limiting
 distribution of the test statistic parametric bootstrap or permutation.}
 
-\item{ts_ld_bs_samp}{The number of test statistic limiting distribution 
+\item{ts_ld_bs_samp}{The number of test statistic limiting distribution
 bootstrap samples to be drawn.}
 
 \item{...}{Other arguments needed in other places.}
