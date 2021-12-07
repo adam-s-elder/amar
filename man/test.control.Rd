@@ -5,65 +5,42 @@
 \title{Control function for the adaptive norm test}
 \usage{
 test.control(
-  big_train = TRUE,
-  f_cv_summary = mean,
   more_info = NULL,
-  n_bs_smp = 300,
+  n_mc_samples = 300,
   nrm_type = "lp",
-  nrmlize = FALSE,
-  num_folds = 1,
-  perf_meas = "est_pow",
+  perf_meas = "est_acc",
   pos_lp_norms = c(1, 2, 3, "max"),
   show_hist = FALSE,
-  test_stat_func = mean,
   ld_est_meth = "par_boot",
   ts_ld_bs_samp = 250,
   ...
 )
 }
 \arguments{
-\item{big_train}{Data is split into splits of roughly equal sizes. The
-number of splits is equal to num_folds. If big_train is TRUE then all
-but one of these splits will be training data, if big_train is
-FALSE all but one will be testing data.}
-
-\item{f_cv_summary}{How test statistics from different folds are combined to create an overall
-test statistic.  Usually the mean is used.}
-
-\item{more_info}{Boolean indicating if the test schould return more
+\item{more_info}{Boolean indicating if the test should return more
 information that just the p-value.  When true, the chosen norm index,
 the bonferroni based p-value, the test statistic,
 and the estimated distribution of the test statistic will be returned.}
 
-\item{n_bs_smp}{Number of samples to be used in estimating the limiting distribution of the
-test statistic under the null.}
+\item{n_mc_samples}{Number of samples to be used in estimating the limiting
+distribution of the test statistic under the null.}
 
 \item{nrm_type}{The type of norm to be used for the test.
 Generally the l_p norm}
 
-\item{nrmlize}{Boolean for if the estimator should be normalized to have
-a limiting distribution with identity covaraince matrix.}
-
-\item{num_folds}{The number of folds to be used in the cross-validation proceedure.  If set to 1,
-no cross validation will be used.}
-
 \item{perf_meas}{the prefered measure used to generate the test statistic.}
 
-\item{pos_lp_norms}{The index of the norms to be considered.  For example if we use the l_p norm,
-norms_indx specifies the different p's to try.}
+\item{pos_lp_norms}{The index of the norms to be considered.  For example if
+we use the l_p norm, norms_indx specifies the different p's to try.}
 
-\item{show_hist}{set to True if you would like to see a histogram of the test statistic's
-limiting distribution bootstrap draws compared to the estimated parameter.}
+\item{show_hist}{set to True to see a histogram of the test statistic's
+limiting distribution MC draws compared to the estimated parameter.}
 
-\item{test_stat_func}{A function that will provide the test statistic
-for the given fold (using the testing data), and uses the best
-norm (decided on using the training data).}
+\item{ld_est_meth}{String indicating method for estimating the limiting
+distribution of the test statistic parametric bootstrap or permutation.}
 
-\item{ld_est_meth}{Method for estimating the limiting distribution of the test statistic
-parametric bootstrap or permutation (permutation works better for small sample sizes)}
-
-\item{ts_ld_bs_samp}{The number of test statisitic limiting distribution bootstrap samples to be
-drawn.}
+\item{ts_ld_bs_samp}{The number of test statistic limiting distribution 
+bootstrap samples to be drawn.}
 
 \item{...}{Other arguments needed in other places.}
 }

@@ -3,8 +3,7 @@
 #' These functions will be given an entire dataset, and will
 #' return the estimate for the parameter, and for each
 #' estimated influence curve at each observation. The first column
-#' of your data should correspond to the variable of interest
-#' (the variable for which pearson correlation is calculated).
+#' The first column of obs_data should be the binary outcome of interest.
 #'
 #' Obtain an estimator of the probability delta = 1 given w
 #' @param obs_data the observed data.  The first column should be the outcome.

@@ -3,21 +3,24 @@
 \name{pval_for_mag}
 \alias{pval_for_mag}
 \title{Calculate the estimated p-value for a given observed alternative
-and a given norm}
+and a given norm.}
 \usage{
-pval_for_mag(boot_data, dir, lp = 2, nrm_type = "lp")
+pval_for_mag(mc_limit_dstr, dir, norms_idx = 2, norm_type = "lp", ...)
 }
 \arguments{
-\item{boot_data}{the simulated data draw from
+\item{mc_limit_dstr}{the simulated data draw from
 the limiting distribution under the null}
 
 \item{dir}{the observed estimate of the parameter}
 
-\item{lp}{the index for the norm used}
+\item{norms_idx}{the index for the norm used}
 
-\item{nrm_type}{the type of norm used}
+\item{norm_type}{the type of norm used}
+
+\item{...}{additional arguments that may be passed to
+pval_for_mag, but which will be ignored.}
 }
 \description{
 Calculate the estimated p-value for a given observed alternative
-and a given norm
+and a given norm.
 }

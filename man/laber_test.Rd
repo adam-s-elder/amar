@@ -4,16 +4,14 @@
 \alias{laber_test}
 \title{Carry out the test described by Zhang and Laber}
 \usage{
-laber_test(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "lp")
+laber_test(obs_data, pos_lp_norms, n_mc_samples, nrm_type = "lp")
 }
 \arguments{
 \item{obs_data}{The observed data}
 
 \item{pos_lp_norms}{Potential norms to be considered}
 
-\item{num_folds}{the number of folds to use in the cross-validation proceedure}
-
-\item{n_bs_smp}{the number of bootstrap samples to take when estimating the
+\item{n_mc_samples}{the number of bootstrap samples to take when estimating the
 limiting distribution}
 
 \item{nrm_type}{the class of norms to be selected over.}

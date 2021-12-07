@@ -4,7 +4,7 @@
 \alias{ic.proj.rr}
 \title{Estimate both the parameter, and the influence
 curves used for estimating the projected risk ratio. The first column
-of your data should correspond to the variable of interest}
+of your data should correspond to the variable of interest.}
 \usage{
 ic.proj.rr(obs_data, what = "both", control = NULL)
 }
@@ -19,5 +19,5 @@ ic.proj.rr(obs_data, what = "both", control = NULL)
 \description{
 Estimate both the parameter, and the influence
 curves used for estimating the projected risk ratio. The first column
-of your data should correspond to the variable of interest
+of your data should correspond to the variable of interest.
 }

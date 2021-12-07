@@ -131,17 +131,19 @@ make_data <- function(ss, dim, rho, model = 1, b = NULL){
   diag(x_cov) <- 1
   X <- MASS::mvrnorm(n = ss, mu = rep(0, dim), Sigma = x_cov)
   epsilon <- stats::rnorm(ss)
-  if (model == 1){
+  if (model == 1) {
     data <- cbind(epsilon, X)
   }
-  if (model == 2){
+  if (model == 2) {
     data <- cbind(X[, 1]/4 + epsilon, X)
   }
-  if (model == 3){
+  if (model == 3) {
     beta <- c(rep(c(0.15, -0.1), each = 5), rep(0, dim - 10))
     data <- cbind(X %*% beta + epsilon, X)
   }
-  if (model == 4){
+  if (model == 4) {
+    # A potential other alternative to consider
+    # though this is not considered anywhere before.
     theta_n <- c(b, rep(0, dim - 1))/sqrt(ss)
     data <- cbind(X %*% theta_n + epsilon, X)
   }

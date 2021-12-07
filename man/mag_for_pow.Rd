@@ -2,40 +2,30 @@
 % Please edit documentation in R/mag_for_pow.R
 \name{mag_for_pow}
 \alias{mag_for_pow}
-\title{Helper function for est_local_pow.  This function
-is used to estimate the magnitude needed for a
-certain direction to achive a given power.}
+\title{This function is used to estimate the magnitude needed for a
+certain direction to achieve 80\% power for a proposed alternative.}
 \usage{
-mag_for_pow(
-  boot_data,
-  dir,
-  lp_nrms = 2,
-  power = 0.8,
-  nf_quants,
-  nrm_type = "lp"
-)
+mag_for_pow(mc_limit_dstr, dir, norms_idx = 2, null_quants, norm_type = "lp")
 }
 \arguments{
-\item{boot_data}{bootstrap estimates of the (centered) limiting distribution.
-Data where columns correspond to different covariates, and rows are independent observations.}
+\item{mc_limit_dstr}{MC draws from the estimated (centered)
+limiting distribution. Columns correspond to different covariates,
+and rows are independent observations.}
 
-\item{dir}{the direction for which we wish to find the magnitude needed to achieve
-the speceified power.}
+\item{dir}{the direction for which we wish to find the magnitude needed
+to achieve 80\% power.}
 
-\item{lp_nrms}{the norms to be used.}
+\item{norms_idx}{the norms to be considered.}
 
-\item{power}{power which the local alternative is to achieve
-for a magnitude that will be solved.}
+\item{null_quants}{ninety five percent quantiles for each of the
+different norms}
 
-\item{nf_quants}{ninety five percent quantiles for each of the different norms}
-
-\item{nrm_type}{the class of norms to be used}
+\item{norm_type}{the class of norms to be used}
 }
 \value{
 Magnitude for the specified lp norm for a given local alternative.
 }
 \description{
-Helper function for est_local_pow.  This function
-is used to estimate the magnitude needed for a
-certain direction to achive a given power.
+This function is used to estimate the magnitude needed for a
+certain direction to achieve 80\% power for a proposed alternative.
 }
