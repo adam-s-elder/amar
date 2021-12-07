@@ -170,9 +170,8 @@ causalNullTest <- function(Y, A, W, p=2,
     if (return_ic_est){
       return(list("est" = Omega.hat, "ic" = IF.vals, "gridpnts" = a.vals))
     }else{
-      Sigma.hat <- sapply(1:length(a.vals), function(s) sapply(1:length(a.vals), function(t) {
-        mean(IF.vals[,s] * IF.vals[,t])
-      }))
+      Sigma.hat <- sapply(1:length(a.vals), function(s) sapply(1:length(a.vals), 
+      function(t) {mean(IF.vals[,s] * IF.vals[,t])}))
     }
   }else{
     fold.Omega.hats <- matrix(NA, nrow = control$V, ncol = length(a.vals))
