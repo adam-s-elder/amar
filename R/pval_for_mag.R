@@ -1,36 +1,39 @@
 #' Calculate the estimated p-value for a given observed alternative
-#' and a given norm
-#' @param boot_data the simulated data draw from
+#' and a given norm.
+#' @param mc_limit_dstr the simulated data draw from
 #' the limiting distribution under the null
 #' @param dir the observed estimate of the parameter
-#' @param lp the index for the norm used
-#' @param nrm_type the type of norm used
+#' @param norms_idx the index for the norm used
+#' @param norm_type the type of norm used
+#' @param ... additional arguments that may be passed to
+#' pval_for_mag, but which will be ignored.
 #'
 #' @export
-
-pval_for_mag <- function(boot_data, dir, lp = 2, nrm_type = "lp"){
-  num_norms <- length(lp)
+ 
+pval_for_mag <- function(mc_limit_dstr, dir, norms_idx = 2,
+                         norm_type = "lp", ...) {
+  num_norms <- length(norms_idx)
   est_pvals <- rep(NA, num_norms)
-
-  distr <- matrix(NA, nrow = nrow(boot_data), ncol = num_norms)
-  if(nrm_type == "ordl2"){
-    num_obs <- nrow(boot_data)
+  distr <- matrix(NA, nrow = nrow(mc_limit_dstr), ncol = num_norms)
+  if(norm_type == "ssq"){
+    num_obs <- nrow(mc_limit_dstr)
     trans_dir <- cumsum(dir ** 2)
     for(obs_idx in 1:num_obs){
-      distr[obs_idx, ] <- cumsum(sort(boot_data[obs_idx, ] ** 2, decreasing = TRUE))
+      distr[obs_idx, ] <- cumsum(sort(mc_limit_dstr[obs_idx, ] ** 2, decreasing = TRUE))
     }
     for(lp_idx in 1:num_norms){
-      trans_est <- trans_dir[lp[lp_idx]]
-      est_pvals[lp_idx] <- mean(as.numeric(distr[, lp[lp_idx]] >= trans_est))
+      trans_est <- trans_dir[norms_idx[lp_idx]]
+      est_pvals[lp_idx] <- mean(as.numeric(distr[, norms_idx[lp_idx]] >= trans_est))
     }
     return(est_pvals)
   }
-  if(nrm_type == "lp"){
-    nrmd_distr <- apply(boot_data, 1, l_p_norm, p = lp[lp_idx], type = "lp")
+  if(norm_type == "lp"){
+    nrmd_distr <- apply(mc_limit_dstr, 1, l_p_norm, p = norms_idx[lp_idx], type = "lp")
     for(lp_idx in 1:num_norms){
-      trans_dir <- l_p_norm(dir, p = lp[lp_idx], type = "lp")
+      trans_dir <- l_p_norm(dir, p = norms_idx[lp_idx], type = "lp")
       est_pvals[lp_idx] <- mean(as.numeric(nrmd_distr >= trans_dir))
     }
+    names(est_pvals) <- norms_idx
     return(est_pvals)
   }
 }

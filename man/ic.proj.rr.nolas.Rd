@@ -2,10 +2,9 @@
 % Please edit documentation in R/IC-DE2_nolas.R
 \name{ic.proj.rr.nolas}
 \alias{ic.proj.rr.nolas}
-\title{Estimate both the parameter, and the influence
+\title{Estimate both the parameter, and or the influence
 curves used for estimating the projected risk ratio (not using lasso).
-The first column #' of your data should correspond to the
-variable of interest}
+The first column of your data should correspond to the variable of interest.}
 \usage{
 ic.proj.rr.nolas(obs_data, what = "both", control = NULL)
 }
@@ -18,8 +17,7 @@ ic.proj.rr.nolas(obs_data, what = "both", control = NULL)
 \item{control}{any other control parameters to be passed to the estimator.}
 }
 \description{
-Estimate both the parameter, and the influence
+Estimate both the parameter, and or the influence
 curves used for estimating the projected risk ratio (not using lasso).
-The first column #' of your data should correspond to the
-variable of interest
+The first column of your data should correspond to the variable of interest.
 }

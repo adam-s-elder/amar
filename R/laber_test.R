@@ -6,26 +6,24 @@
 #### optimize the l_p norm within the procedure
 #################################################
 
-
 #' Carry out the test described by Zhang and Laber
 #'
 #' @param obs_data The observed data
 #' @param pos_lp_norms Potential norms to be considered
-#' @param num_folds the number of folds to use in the cross-validation proceedure
-#' @param n_bs_smp the number of bootstrap samples to take when estimating the
+#' @param n_mc_samples the number of bootstrap samples to take when estimating the
 #' limiting distribution
 #' @param nrm_type the class of norms to be selected over.
 #'
 #' @export
 
-laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "lp"){
+laber_test <- function(obs_data, pos_lp_norms, n_mc_samples, nrm_type = "lp") {
   ## The cross validation procedure for our observed data
   num_obs   <- nrow(obs_data)
   num_norms <- length(pos_lp_norms)
   est_and_ic <- ic.pearson(obs_data, what = "both")
   est_cov   <- est_and_ic$ic
   param_est <-  est_and_ic$est
-  norm_mat  <- matrix(stats::rnorm(n_bs_smp * nrow(est_cov)), nrow = n_bs_smp)
+  norm_mat  <- matrix(stats::rnorm(n_mc_samples * nrow(est_cov)), nrow = n_mc_samples)
   e_lm_dstr <- gen_boot_sample(norm_mat, est_cov, center = TRUE, rate = "rootn")
   cutoff_vals <- rep(NA, num_norms)
   for(nrm_idx in 1:num_norms){
@@ -35,27 +33,33 @@ laber_test <- function(obs_data, pos_lp_norms, num_folds, n_bs_smp, nrm_type = "
   }
   lp_perf <- rep(NA, num_norms)
   #cat("Magn =", round(magn, 2), " ")
-  for(lp_idx in 1:num_norms){
-    lp_perf[lp_idx] <- pow_for_mag(e_lm_dstr, dir = param_est,
-                                   lp = pos_lp_norms[lp_idx],
-                                   nf_quants = cutoff_vals[lp_idx], nrm_type = nrm_type)
+  for (lp_idx in 1:num_norms) {
+    function(mc_limit_dstr, dir,
+                        null_quants, norms_idx = 2,
+                        nrm_type = "lp")
+    lp_perf[lp_idx] <- accept_rate(
+      mc_limit_dstr = e_lm_dstr,
+      dir = param_est, norms_idx = pos_lp_norms[lp_idx],
+      null_quants = cutoff_vals[lp_idx], norm_type = nrm_type
+    )
   }
 
   test_stat <- max(lp_perf)
   ## Simulating the above proceedure for new data.
-  sim_ts_mat  <- matrix(stats::rnorm(n_bs_smp * nrow(est_cov)),
-                        nrow = n_bs_smp)
+  sim_ts_mat  <- matrix(stats::rnorm(n_mc_samples * nrow(est_cov)),
+                        nrow = n_mc_samples)
   f_e_lm_dstr <- gen_boot_sample(sim_ts_mat, est_cov, center = TRUE, rate = "rootn")
-  boot_sims <- rep(NA, n_bs_smp)
-  for (bs in 1:n_bs_smp) {
+  boot_sims <- rep(NA, n_mc_samples)
+  for (bs in 1:n_mc_samples) {
     boot_p_est <-  f_e_lm_dstr[bs, ]
     lp_perf <- rep(NA, num_norms)
     #if (bs %% 10 == 0){cat("Magn =", round(magn, 2), " ")}
-    for(lp_idx in 1:num_norms) {
-      lp_perf[lp_idx] <- pow_for_mag(
-        e_lm_dstr, dir = boot_p_est, lp = pos_lp_norms[lp_idx],
-        nf_quants = cutoff_vals[lp_idx], nrm_type = nrm_type
-        )
+    for (lp_idx in 1:num_norms) {
+      lp_perf[lp_idx] <- accept_rate(
+      mc_limit_dstr = e_lm_dstr,
+      dir = boot_p_est, norms_idx = pos_lp_norms[lp_idx],
+      null_quants = cutoff_vals[lp_idx], norm_type = nrm_type
+    )
     }
     boot_sims[bs] <-  max(lp_perf)
 
@@ -104,7 +108,7 @@ ZL <- function(observed_data, ts_sims, ld_sims){
       "test_st_eld" = ts_est_dstr,
       "chosen_norm" = chsn_nrms,
       "param_ests" = psi_hats,
-      "param_sds" = sqrt(diag(x_cor_mat))
+      "param_ses" = sqrt(diag(x_cor_mat))
     )
   )
 }
@@ -153,16 +157,16 @@ est_pows <- function(tr_lm_dstr, ts_vec){
 bonf_test <- function(obs_data, test_type = "pearson"){
   if(test_type == "pearson"){
     num_cov <- ncol(obs_data)
-    pvals <- param_sds <- param_ests <- rep(NA, num_cov - 1)
+    pvals <- param_ses <- param_ests <- rep(NA, num_cov - 1)
     for(cov_idx in 2:num_cov){
       cov_lm <- stats::lm(obs_data[, 1] ~ obs_data[, cov_idx])
       pvals[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 4]
       param_ests[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 1]
-      param_sds[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 2]
+      param_ses[cov_idx - 1] <- summary(cov_lm)$coefficients[2, 2]
     }
   }else{
     if(test_type == "mean"){
-      param_ests <- param_sds <- NULL
+      param_ests <- param_ses <- NULL
       num_cov <- ncol(obs_data)
       pvals <- rep(NA, num_cov)
       for(cov_idx in 1:num_cov){
@@ -177,7 +181,7 @@ bonf_test <- function(obs_data, test_type = "pearson"){
       "test_st_eld" = NULL,
       "chosen_norm" = NULL,
       "param_ests" = param_ests,
-      "param_sds" = param_sds
+      "param_ses" = param_ses
     )
   )
 }

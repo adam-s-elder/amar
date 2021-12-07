@@ -2,26 +2,30 @@
 % Please edit documentation in R/find_mag.R
 \name{find_mag}
 \alias{find_mag}
-\title{Find the multiplicitive distance of a specified alternative from the alternative in the
-same direction what obtains a specified power (usually 80\%).}
+\title{Find the multiplicative distance of a specified alternative from
+the alternative in the same direction that obtains a power of 80\%.}
 \usage{
 find_mag(one_obs, dir, cutoff, nrm_idx, nrm_type)
 }
 \arguments{
 \item{one_obs}{A single observed value from the limiting distribution.}
 
-\item{dir}{The shift by which the single observation will moved.  Generally the estimated parameter.}
+\item{dir}{The shift by which the single observation will moved.  Generally
+the estimated parameter.}
 
-\item{cutoff}{The cutoff value of the normed limiting distribution. The estimated parameters which will be the mean of the multiplier bootstrap sample.}
+\item{cutoff}{The cutoff value of the normed limiting distribution. The
+estimated parameters which will be the mean of the multiplier bootstrap
+sample.}
 
 \item{nrm_idx}{index of the potential norms to be used.}
 
 \item{nrm_type}{specifies the type of norm to be used.}
 }
 \value{
-The magnitude by which the shift must be multiplied to surpass the cutoff for the given observation.
+The magnitude by which the shift must be multiplied to surpass the
+cutoff for the given observation.
 }
 \description{
-Find the multiplicitive distance of a specified alternative from the alternative in the
-same direction what obtains a specified power (usually 80\%).
+Find the multiplicative distance of a specified alternative from
+the alternative in the same direction that obtains a power of 80\%.
 }

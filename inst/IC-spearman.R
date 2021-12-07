@@ -1,14 +1,3 @@
-################################################################
-#### Estimating Influence Curve and parameter for spearman corrlation
-#### Adam Elder
-#### This script will contain all of the various proceedures
-#### used for estimating both the parameter, and the influence
-#### curves used for estimating spearman correlation.
-#### These functions will be given an entire dataset, and will
-#### return the estimate for the parameter, and for each
-#### estimated influence curve at each observation.
-################################################################
-
 #### The following function will take a set of observations, and return the
 #### estimated covariance matrix for the estimates of the spearman correlation.
 #### Estimates of the covariance are generated using the empirical influence
@@ -17,7 +6,7 @@
 #### calculated.
 
 
-est_influence_spearman <- function(observ){
+est_influence_spearman <- function(observ) {
   n <- nrow(observ)
   num_cov <- ncol(observ) - 1
   est_IC <- matrix(NA, nrow = n, ncol = num_cov)
@@ -34,7 +23,7 @@ est_influence_spearman <- function(observ){
         mean(y_ecdf_vals * ifelse(x_vals >= x, 1, 0))}
     est_IC[, i - 1] <- mapply(ic_fun, x_vals, y_vals)
   }
-  return( 12 * est_IC)
+  return(12 * est_IC)
 }
 
 est_spearman <- function(observ){
@@ -47,5 +36,3 @@ spearman <- function(est_or_IC){
   else{stop("You must specify if you want the estimate of the parameter (est),
             or the influence curve (IC)")}
 }
-
-

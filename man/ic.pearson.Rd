@@ -2,9 +2,7 @@
 % Please edit documentation in R/IC-calc.R
 \name{ic.pearson}
 \alias{ic.pearson}
-\title{The following function will take a set of observations, and return the
-variable of interest (the variable for which pearson correlation is
-calculated).}
+\title{Pearson Correlation IC and estimate}
 \usage{
 ic.pearson(observ, what = "both", control = NULL)
 }
@@ -17,7 +15,10 @@ ic.pearson(observ, what = "both", control = NULL)
 \item{control}{any other control parameters to be passed to the estimator.}
 }
 \description{
-The following function will take a set of observations, and return the
-variable of interest (the variable for which pearson correlation is
-calculated).
+This function takes a set of observations, and returns an estimate
+and its corresponding estimated IC matrix for the estimates of the
+pearson correlation. Estimates of the covariance are generated using
+the empirical influence function.  The first column of your data should
+correspond to the variable of interest (the variable for which pearson
+correlation is calculated).
 }
