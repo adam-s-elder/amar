@@ -1,0 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^prev_study.*
+^LICENSE\.md$
+^\.github$
