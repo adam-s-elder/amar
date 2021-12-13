@@ -77,4 +77,3 @@ mv_pn_test <- function(obs_data, param_est = NULL,
     return(c("p-value" = p_val))
   }
 }
-
