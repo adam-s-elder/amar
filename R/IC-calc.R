@@ -31,7 +31,7 @@ ic.pearson <- function(observ, what = "both", control = NULL){
       function(x) mean(x ** 2) ** (1 / 2)
     )
     covs <- as.numeric(crossprod(obs_cent[, 1, drop = FALSE],
-                                 obs_cent[, -1]))/n
+                                 obs_cent[, -1, drop = FALSE])) / n
     x_sd <- sigmas[-1]
     y_sd <- sigmas[1]
     cors <- covs / (y_sd * x_sd)
@@ -54,7 +54,8 @@ ic.pearson <- function(observ, what = "both", control = NULL){
     ret$ic <- ic
   }
   if (what %in% c("both", "est")) {
-    ret$est <- stats::cor(observ[, 1], observ[, -1], method = "pearson")
+    ret$est <- stats::cor(observ[, 1], observ[, -1, drop = FALSE],
+                          method = "pearson")
   }
   return(ret)
 }
