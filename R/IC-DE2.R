@@ -9,7 +9,7 @@
 #'
 #' @export
 
-ic.proj.rr <-  function(obs_data, what = "both", control = NULL){
+ic.proj.rr <-  function(obs_data, what = "both", control = NULL) {
   if (!(what %in% c("ic", "est", "both"))) {
     stop("what must be one of ic (influence curve), est (estimate), or both")
   }

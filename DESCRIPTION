@@ -9,5 +9,5 @@ Description: More about what it does (maybe more than one line)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: MASS, GA, stats, SuperLearner, glmnet, expm, dplyr, rlang, ggplot2, tidyr, fda
+Imports: MASS, stats, SuperLearner, glmnet, dplyr, rlang, ggplot2, tidyr
 RoxygenNote: 7.1.2

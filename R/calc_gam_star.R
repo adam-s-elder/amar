@@ -17,7 +17,7 @@
 #' @export
 
 calc_gam_star <- function(obs_data, param_est, control,
-                   lm_dst = NULL, return_lmd = FALSE) {
+                          lm_dst = NULL, return_lmd = FALSE) {
   n_mc_samples <- control$n_mc_samples
   pos_lp_norms <- control$pos_lp_norms
   if (!is.null(lm_dst)) {
@@ -68,12 +68,3 @@ calc_gam_star <- function(obs_data, param_est, control,
     return(list("gam_star_n" = gam_star_n, "chsn_norms" = chsn_norm))
   }
 }
-
-# if (nrm_type == "bonf") {
-#     par_est <- sqrt(nrow(obs_data)) *
-#       (as.vector(apply(ic_est, 2, mean)) +
-#          as.vector(est_and_ic$est))
-#     gam_star_n <- NULL
-#     chsn_norm <- NULL
-#     t_s_f <- NULL
-#   }
