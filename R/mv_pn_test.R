@@ -63,7 +63,11 @@ mv_pn_test <- function(obs_data, param_est = NULL,
     chsn_tbl <- vapply(control$pos_lp_norms,
                        function(x) mean(x == init_est$chsn_norms),
                        FUN.VALUE = -99)
-    var_mat <- t(ic_est) %*% ic_est / nrow(ic_est)
+    if (control$ret_cov_mat) {
+      var_mat <- t(ic_est) %*% ic_est / nrow(ic_est)
+    }else{
+      var_mat <-  NULL
+    }
     return(list("pvalue" = p_val,
                 "test_stat" = gam_star_n,
                 "test_st_eld" = ts_lim_dist,

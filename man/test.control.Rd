@@ -5,7 +5,6 @@
 \title{Control function for the adaptive norm test}
 \usage{
 test.control(
-  more_info = TRUE,
   n_mc_samples = 300,
   nrm_type = "lp",
   perf_meas = "est_acc",
@@ -13,15 +12,12 @@ test.control(
   show_hist = FALSE,
   ld_est_meth = "par_boot",
   ts_ld_bs_samp = 250,
+  more_info = TRUE,
+  ret_cov_mat = FALSE,
   ...
 )
 }
 \arguments{
-\item{more_info}{Boolean indicating if the test should return more
-information that just the p-value.  When true, the chosen norm index,
-the bonferroni based p-value, the test statistic,
-and the estimated distribution of the test statistic will be returned.}
-
 \item{n_mc_samples}{Number of samples to be used in estimating the limiting
 distribution of the test statistic under the null.}
 
@@ -41,6 +37,16 @@ distribution of the test statistic parametric bootstrap or permutation.}
 
 \item{ts_ld_bs_samp}{The number of test statistic limiting distribution
 bootstrap samples to be drawn.}
+
+\item{more_info}{Boolean indicating if the function should return more
+information that just the p-value.  When true, the chosen norm index,
+the bonferroni based p-value, the test statistic,
+and the estimated distribution of the test statistic will be returned.}
+
+\item{ret_cov_mat}{Boolean indicating if the function should also return
+the estimated covariance matrix.  This can somewhat slow computation and
+result in large file sizes at higher dimensions. The argument `more_info`
+must be set to `TRUE` for this option to be possible.}
 
 \item{...}{Other arguments needed in other places.}
 }

@@ -73,11 +73,11 @@ ic.proj.rr <-  function(obs_data, what = "both", control = NULL) {
                               dmat3, dmat4)
   }
   grad_mat <- matrix(NA, nrow = nrow(psi_mat), ncol = 4)
-  for (c_idx in 1:nrow(psi_mat)) {
+  for (c_idx in seq_len(nrow(psi_mat))) {
     grad_mat[c_idx, ] <- ic_delt_methd(psi_mat[c_idx, ])
   }
   IC <- matrix(NA, nrow = nrow(obs_data), ncol = nrow(grad_mat))
-  for (p_idx in 1:nrow(grad_mat)) {
+  for (p_idx in seq_len(nrow(grad_mat))) {
     IC[, p_idx] <- Dmat[, , p_idx] %*% t(grad_mat[c_idx, , drop = FALSE])
   }
   if (what %in% c("est", "both")) {
@@ -144,7 +144,7 @@ smth_func <- function(x){
 }
 
 las_ydw <- function(y_vec, delt_vec, obs_ws, simp = FALSE){
-  if(simp){
+  if (simp) {
     l_mod_ydw <- function(ws){
       return(rep(0.5, nrow(ws)))
     }
