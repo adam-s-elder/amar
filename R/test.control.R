@@ -60,7 +60,7 @@ test.control <- function(
   }
   names.dot.args <- names(dot.args)
   if (length(dot.args) > 0) {
-    for (i in 1:length(dot.args)) {
+    for (i in seq_len(length(dot.args))) {
       p[[names.dot.args[i]]] <- dot.args[[i]]
     }
   }

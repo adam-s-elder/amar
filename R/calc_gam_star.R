@@ -18,7 +18,6 @@
 
 calc_gam_star <- function(obs_data, param_est, control,
                           lm_dst = NULL, return_lmd = FALSE) {
-  n_mc_samples <- control$n_mc_samples
   pos_lp_norms <- control$pos_lp_norms
   if (!is.null(lm_dst)) {
     psi_est <- param_est(obs_data)$est
@@ -26,6 +25,7 @@ calc_gam_star <- function(obs_data, param_est, control,
     est_and_ic <- param_est(obs_data, what = "both", control = control)
     ic_est <- est_and_ic$ic
     psi_est <- est_and_ic$est
+    n_mc_samples <- control$n_mc_samples
     norm_mat  <- matrix(
       stats::rnorm(n_mc_samples * nrow(ic_est)), nrow = n_mc_samples
       )

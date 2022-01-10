@@ -59,7 +59,7 @@ mv_pn_test <- function(obs_data, param_est = NULL,
     graphics::hist(ts_lim_dist)
     graphics::abline(v = gam_star_n, col = "red")
   }
-  if (!is.null(control$more_info)) {
+  if (control$more_info) {
     chsn_tbl <- vapply(control$pos_lp_norms,
                        function(x) mean(x == init_est$chsn_norms),
                        FUN.VALUE = -99)
