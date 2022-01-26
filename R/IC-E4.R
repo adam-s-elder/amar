@@ -5,6 +5,10 @@
 #' estimated influence curve at each observation. The first column
 #' The first column of obs_data should be the binary outcome of interest.
 #'
+#' Most of this code has been copied and slightly modified from the
+#' ltmle package and is copyrighted by Joshua Schwab under the terms of
+#' the GPL-2 license.
+#'
 #' Obtain an estimator of the probability delta = 1 given w
 #' @param obs_data the observed data.  The first column should be the outcome.
 #' @param what the desired return value. Should be one of `"ic"`

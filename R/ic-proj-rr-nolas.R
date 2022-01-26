@@ -58,11 +58,11 @@ ic.proj.rr.nolas <-  function(obs_data, what = "both", control = NULL){
       Dmat[, ,cov_idx] <- cbind(dmat12[, 1], dmat12[, 2], dmat3, dmat4)
   }
   grad_mat <- matrix(NA, nrow = nrow(psi_mat), ncol = 4)
-  for(c_idx in 1:nrow(psi_mat)){
+  for(c_idx in seq_len(nrow(psi_mat))) {
     grad_mat[c_idx, ] <- ic.delt_methd(psi_mat[c_idx, ])
   }
   IC <- matrix(NA, nrow = nrow(obs_data), ncol = nrow(grad_mat))
-  for(p_idx in 1:nrow(grad_mat)){
+  for(p_idx in seq_len(nrow(grad_mat))) {
     IC[, p_idx] <- Dmat[, , p_idx] %*% t(grad_mat[c_idx, , drop = FALSE])
   }
   if (what %in% c("est", "both")) {
@@ -113,14 +113,14 @@ ic.delt_methd <- function(xes){
   return(grad)
 }
 
-las_dw_nl <- function(delt_vec, obs_ws){
+las_dw_nl <- function(delt_vec, obs_ws) {
   sl_fit <- SuperLearner::SuperLearner(
     Y = delt_vec, X = obs_ws,
     ## Maybe try SL.polymars instead??
     SL.library = c("SL.glm", "SL.loess", "SL.ranger"),
     family = "gaussian")
 
-  new_funct <- function(ws){
+  new_funct <- function(ws) {
     pmax(stats::predict(sl_fit, newdata = ws,
                         onlySL = TRUE)$pred[, , drop = TRUE],
          0.01)
@@ -128,7 +128,7 @@ las_dw_nl <- function(delt_vec, obs_ws){
   return(new_funct)
 }
 
-las_ydw_nl <- function(y_vec, delt_vec, obs_ws){
+las_ydw_nl <- function(y_vec, delt_vec, obs_ws) {
   ys <- y_vec[delt_vec == 1]
   ws <- obs_ws[delt_vec == 1, ]
   sl_fit <- SuperLearner::SuperLearner(
