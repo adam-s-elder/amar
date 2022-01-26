@@ -19,9 +19,9 @@
 gen_boot_sample <- function(epsilon_mat , obs_ic, center = TRUE,
                             param_est = 0, rate = "n"){
   num_obs <- nrow(obs_ic)
-  if (rate == "rootn"){
+  if (rate == "rootn") {
     cent_boot <-  epsilon_mat %*% obs_ic / sqrt(num_obs)
-  }else if (rate == "n"){
+  }else if (rate == "n") {
     cent_boot <-  epsilon_mat %*% obs_ic / num_obs
   }
   if(center == TRUE){
