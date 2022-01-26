@@ -17,6 +17,9 @@ ic.pearson <- function(observ, what = "both", control = NULL){
   if (!(what %in% c("ic", "est", "both"))) {
     stop("what must be one of ic (influence curve), est (estimate), or both")
   }
+  if (is.data.frame(observ)) {
+    observ <- as.matrix(observ)
+  }
   ret <- list()
   if (what %in% c("ic", "both")) {
     n <- nrow(observ)
