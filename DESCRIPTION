@@ -1,7 +1,7 @@
-Package: amar
+Package: amp
 Type: Package
 Title: Statistical Test for the Multivariate Point Null Hypotheses
-Version: 0.1.1
+Version: 1.0.0
 Authors@R:
     c(person(given = "Adam",
              family = "Elder",
@@ -14,10 +14,13 @@ Description: A package for testing the multivariate point null hypothesis.
     Use four spaces when indenting paragraphs within the Description.
 License: GPL (>= 3)
 Encoding: UTF-8
+BugReports: https://github.com/adam-s-elder/XXXXXX/issues
 LazyData: true
 Imports: MASS, stats, SuperLearner, glmnet, dplyr, rlang, ggplot2, tidyr
 RoxygenNote: 7.1.2
 Suggests: 
     rmarkdown,
-    knitr
+    knitr,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3

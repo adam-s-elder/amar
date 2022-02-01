@@ -42,9 +42,9 @@ test.control <- function(
   p <- .get.args(formal_args, dot_args)
   if (is.character(p$perf_meas)) {
     p$perf_meas <- list(
-      "est_acc" = amar::accept_rate,
-      "pval" = amar::pval_for_mag,
-      "mag" = amar::mag_for_pow
+      "est_acc" = amp::accept_rate,
+      "pval" = amp::pval_for_mag,
+      "mag" = amp::mag_for_pow
     )[[p$perf_meas]]
   }
   return(p)
