@@ -1,5 +1,5 @@
 ---
-title: "run_test_prebuilt_ic"
+title: "Running a Multivariate Point-Null Test"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{run_test_prebuilt_ic}
