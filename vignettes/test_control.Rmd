@@ -1,0 +1,153 @@
+---
+title: "Better Understanding Test Controls"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Better Understanding Test Controls}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(amp)
+```
+
+## The test control arguments:
+
+| Argument | Description |
+| ------- | ---------- |
+|n_peld_mc_samples |Number of samples to be used in approximating the estimated limiting distribution of the parameter estimate under the null. Increasing this value reduces the approximation error of the test statistic.                                                                                                                                                   | 
+|nrm_type     |The type of norm to be used for the test. Generally the l_p norm                                                                                                                                                                                             |
+|perf_meas    |the preferred measure used to generate the test statistic.                                                                                                                                                                                                    |
+|pos_lp_norms |The index of the norms to be considered. For example if we use the l_p norm, norms_indx specifies the different p's to try.                                                                                                                                  |
+|ld_est_meth  |String indicating method for estimating the limiting distribution of the test statistic parametric bootstrap or permutation.                                                                                                                                 |
+|ts_ld_bs_samp|The number of test statistic limiting distribution bootstrap samples to be drawn.                                                                                                                                                                            |
+|more_info    |Boolean indicating if the function should return more information that just the p-value. When true, the chosen norm index, the bonferroni based p-value, the test statistic, and the estimated distribution of the test statistic will be returned.          |
+|ret_cov_mat  |Boolean indicating if the function should also return the estimated covariance matrix. This can somewhat slow computation and result in large file sizes at higher dimensions. The argument 'more_info' must be set to 'TRUE' for this option to be possible.|
+|...          |Other arguments needed in other places.                                                                                                                                                                                                                      |
+
+Throughout, we will use a simple data generating mechanism:
+
+```{r}
+x_data <- matrix(rnorm(500), ncol = 5)
+y_data <- rnorm(100) + 0.02 * x_data[, 2]
+obs_data <- data.frame(y_data, x_data)
+```
+
+## Test statistic controls
+
+There are multiple options when defining a test statistic outside of the specification of the parameter estimator, $\hat{\Psi}$ and corresponding IC estimator, $\hat{IC}$ (which is specified in the `param_est` argument.  There are four arguments arguments that control these options.  
+
+### perf_meas
+
+The first argument `perf_meas` specifies the **performance measure** used to define the test statistic. Loosely defined, a performance measure is a function that provides information about the performance of a simple test at a specified alternative. It takes as arguments a norm $\varphi$, an alternative $x$ and a limiting distribution $P_0$ and considers the performance of a test defined by
+\[
+  \text{reject if } \varphi\left(\hat{\psi}\right) > c_{\alpha}
+\]
+if the parameter value $\psi$ was equal to $x$. The `perf_meas` specifies which measure of performance to use.  Currently the package has implemented three such measures:
+
+- p-value (specified by setting `perf_meas = "pval"`): The p-value of the test if $\hat{\psi} = x$, defined by 
+$$\Gamma(x, P_0) := \text{pr}(\varphi(x) < \varphi(Z)) \text{ where } Z \sim P_0$$
+- acceptance rate (specified by setting `perf_meas = "est_acc"`): The acceptance rate of the test if $\hat{\psi}$, is normally distributed and centered at $x$ defined by 
+$$\Gamma(x, P_0) := \text{pr}(\varphi(x + Z) < c_\alpha) \text{ where } Z \sim P_0 \text{ and } c_\alpha = F_{\varphi(Z)}^{-1}(1 - \alpha)$$
+
+- multiplicative distance (specified by setting `perf_meas = "mag"`): The minimum $s$ such that 
+$$\text{pr}(\varphi(sx + Z) < c_\alpha) \text{ where } Z \sim P_0 \text{ and } c_\alpha = F_{\varphi(Z)}^{-1}(1 - \alpha)$$
+is lower than $0.2$.
+
+**Recommendation**: Based on what we know currently, we recommend that users use the multiplicative distance performance measure. The other measures can have limiting distributions that are highly concentrated near 0 which can cause issues when approximating the p-value of the test.
+
+We will discuss specification of the norm in the next section. For more details on the procedure, including why performance measures are good for defining a test statistic, see the paper XXXXXXX.  
+
+### Norm specification
+
+Two arguments are used to specify the norm used in defining the test statistic.  The first is `nrm_type` which can either be `"ssq"` or `"lp"`.  These norms are defined as:
+
+- $\ell_p$ norm (`"lp"`): $$\ell_p: (x_1, x_2, \ldots, x_d) \mapsto \sqrt[p]{\sum_{i = 1}^d|x_i|^p} $$
+- Sum of squares norm (`"ssq"`): $$\jmath_{p}:(x_1,x_2,\ldots,x_d)\mapsto \left\{\textstyle\sum_{j=1}^{p}x^2_{(d-j+1)}\right\}^{1/2}$$
+
+The choice of $p$ is specified by the `pos_lp_norms` argument. If `pos_lp_norm` is assigned a single value, a non-adaptive version of the test will be performed.  If instead `pos_lp_norm` is assigned multiple arguments an adaptive test will be carried out.  More information can be found in XXXXXX.  For the $\ell_p$ norm, it is possible to set $p = \infty$.  To make this specification in R, include `"max"` in the vector of values assigned to `pos_lp_norm`.
+
+
+### ld_est_meth
+
+The next argument we review specifies the method by which you wish to estimate the limiting distribution of the test statistic ($\Gamma(\hat{\psi}, \hat{P}_0)$).  There are two options for this argument:
+
+- Parametric bootstrap (specified by setting `ld_est_meth = "par_boot"`): When using the parametric bootstrap version of the test, the estimated limiting distribution of $\Gamma(\hat{\psi}, \hat{P}_0)$ is approximated by assuming that $\hat{\psi}$ has a distribution equal to $\hat{P}_0$ and that $\hat{P}_0$ is normal distribution.
+- Permutation (specified by setting `ld_est_meth = "perm"`): When using the permutation version of the test, the estimated limiting distribution of $\Gamma(\hat{\psi}, \hat{P}_0)$ is approximated by repeatedly permuting the data and recalculating $\hat{\psi}$ using the permuted data. This method may provide better finite sample performance. However, it comes at the cost computational efficiency.  **Also note that depending on the parameter of interest, the permutation based test may not have the same null hypothesis as is desired.  Thus, care must be taken when using this method.**
+
+## Approximation controls
+
+The next two controls specify the accuracy of the approximation of the testing procedure.
+
+### n_peld_mc_samples
+
+To understand this control argument it is important to distinguish between our parameter estimator $\hat{\psi}$ and our test statistic, which is a function of $\hat{\psi}$ and the estimated limiting distribution of $\hat{\psi}$ under the null hypothesis (that $\psi = 0$), denoted by $\hat{P}_0$.  Letting $\Gamma$ denote our performance measure, conditional on our observations, the true value of the test statistic is fixed and equal to $\Gamma(\hat{\psi}, \hat{P}_0)$. 
+
+The `n_peld_mc_samples` argument determines how accurate the approximation of test statistic $\Gamma(\hat{\psi}, \hat{P}_0)$ will be. The performance measure is frequently a function of $\hat{P}_0$ through some probability statement (see the `perf_meas` for examples). To approximate these probabilities, a MC approximation is used and `n_peld_mc_samples` determines how many MC draws are taken.
+
+Considering this argument in practice, note that the testing procedure only approximates the test statistic: 
+
+```{r}
+tc <- amp::test.control(n_peld_mc_samples = 50, pos_lp_norms = "2")
+set.seed(10)
+test_1 <- amp::mv_pn_test(obs_data = obs_data, param_est = amp::ic.pearson, 
+                control = tc)
+set.seed(20)
+test_2 <- amp::mv_pn_test(obs_data = obs_data, param_est = amp::ic.pearson, 
+                control = tc)
+print(c(test_1$test_stat, test_2$test_stat))
+```
+
+In order to better approximate the test statistic, one may increase the value of this control argument:
+
+```{r, fig.width = 8, fig.height = 8}
+mc_draws <- c(10, 50)
+all_res <- list()
+for (mc_draws in c(10, 50)) {
+  set.seed(121)
+  tc <- amp::test.control(n_peld_mc_samples = mc_draws, pos_lp_norms = 2, 
+                          perf_meas = "est_acc")
+  test_stat <- replicate(50, amp::mv_pn_test(obs_data = obs_data,
+                            param_est = amp::ic.pearson,
+                            control = tc)$test_stat)
+  all_res[[as.character(mc_draws)]] <- 
+    data.frame("mc_draws" = mc_draws, test_stat)
+}
+par(mfrow = c(1,2))
+yl <- 25 
+hist(all_res[[1]]$test_stat, main = "MC draws = 10",
+     xlab = "Test Statistic", xlim = c(0, 1), ylim = c(0, yl), 
+     breaks = seq(0, 1, 0.1)) 
+hist(all_res[[2]]$test_stat, main = "MC draws = 50",
+     xlab = "Test Statistic", xlim = c(0, 1),  ylim = c(0, yl), 
+     breaks = seq(0, 1, 0.1))
+```
+
+### ts_ld_bs_samp
+
+The other parameter that determines the approximation accuracy of the testing procedure is `ts_ld_bs_samp`.  This argument determines the number of draws taken from the estimated limiting distribution of $\Gamma(\hat{\psi}, \hat{P}_0)$. This is different that `n_peld_mc_samples` that determines the accuracy of these draws and the test statistic.
+
+## Controling the output of `mv_pn_test`
+
+The last two control arguments determine the output of the `mv_pn_test` function.  
+
+### more_info
+
+The first of these arguments is `more_info`.  If this argument is takes value `FALSE`, then minimum amount of information will be shown (just the p-value).  If this argument is instead `TRUE`, then more information will be displayed, including:
+
+- `test_stat`: The approximate value of the test statistic ($\Gamma(\hat{\psi}, \hat{P}_0)$).
+- `test_st_eld` = The approximate limiting distribution of the test statistic (with length equal to `ts_ld_bs_samp`).
+- `chosen_norm` = A vector indicating which norm was chosen by the adaptive test
+- `param_ests`: The parameter estimate ($\hat{\psi}$).
+- `param_ses`: An estimate of the standard error off each element of $\hat{\psi}$
+- `oth_ic_inf`: Any other information provided by the `param_est` function when calculating the IC and parameter estimates.
+
+The second argument, `ret_cov_mat` if set to `TRUE` (along with `more_info`) will have `var_mat` returned which is the empirical second moment of the IC (equal asymptotically to the variance estimator).  However, this matrix can be quite large for larger dimensions, which is why there is a separate control for this option.
+
