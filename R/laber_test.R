@@ -10,20 +10,20 @@
 #'
 #' @param obs_data The observed data
 #' @param pos_lp_norms Potential norms to be considered
-#' @param n_mc_samples the number of bootstrap samples to take when estimating the
+#' @param n_peld_mc_samples the number of bootstrap samples to take when estimating the
 #' limiting distribution
 #' @param nrm_type the class of norms to be selected over.
 #'
 #' @export
 
-laber_test <- function(obs_data, pos_lp_norms, n_mc_samples, nrm_type = "lp") {
+laber_test <- function(obs_data, pos_lp_norms, n_peld_mc_samples, nrm_type = "lp") {
   ## The cross validation procedure for our observed data
   num_obs   <- nrow(obs_data)
   num_norms <- length(pos_lp_norms)
   est_and_ic <- ic.pearson(obs_data, what = "both")
   est_cov   <- est_and_ic$ic
   param_est <-  est_and_ic$est
-  norm_mat  <- matrix(stats::rnorm(n_mc_samples * nrow(est_cov)), nrow = n_mc_samples)
+  norm_mat  <- matrix(stats::rnorm(n_peld_mc_samples * nrow(est_cov)), nrow = n_peld_mc_samples)
   e_lm_dstr <- gen_boot_sample(norm_mat, est_cov, center = TRUE, rate = "rootn")
   cutoff_vals <- rep(NA, num_norms)
   for(nrm_idx in 1:num_norms){
@@ -46,11 +46,11 @@ laber_test <- function(obs_data, pos_lp_norms, n_mc_samples, nrm_type = "lp") {
 
   test_stat <- max(lp_perf)
   ## Simulating the above proceedure for new data.
-  sim_ts_mat  <- matrix(stats::rnorm(n_mc_samples * nrow(est_cov)),
-                        nrow = n_mc_samples)
+  sim_ts_mat  <- matrix(stats::rnorm(n_peld_mc_samples * nrow(est_cov)),
+                        nrow = n_peld_mc_samples)
   f_e_lm_dstr <- gen_boot_sample(sim_ts_mat, est_cov, center = TRUE, rate = "rootn")
-  boot_sims <- rep(NA, n_mc_samples)
-  for (bs in 1:n_mc_samples) {
+  boot_sims <- rep(NA, n_peld_mc_samples)
+  for (bs in 1:n_peld_mc_samples) {
     boot_p_est <-  f_e_lm_dstr[bs, ]
     lp_perf <- rep(NA, num_norms)
     #if (bs %% 10 == 0){cat("Magn =", round(magn, 2), " ")}

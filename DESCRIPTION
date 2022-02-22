@@ -6,15 +6,14 @@ Authors@R:
     c(person(given = "Adam",
              family = "Elder",
              role = c("aut", "cre"),
-             email = "eldera3@uw.edu",
+             email = "shmelder@gmail.com",
              comment = c(ORCID = "0000-0003-1665-2639")))
-Maintainer: Adam Elder <eldera3@uw.edu>
+Maintainer: Adam Elder <shmelder@gmail.com>
 Description: A package for testing the multivariate point null hypothesis. 
     This package uses the framework described in XXXXX to test the multivariate point null hypothesis.  After the user selects a parameter of interest and defines the assumed data generating mechanism, this information should be encoded in functions for the parameter estimator and its corresponding influence curve. Some parameter and data generating mechanism combinations have codings in this package, and are explained in detail in XXXXX.
-    Use four spaces when indenting paragraphs within the Description.
 License: GPL (>= 3)
 Encoding: UTF-8
-BugReports: https://github.com/adam-s-elder/XXXXXX/issues
+BugReports: https://github.com/adam-s-elder/amp/issues
 LazyData: true
 Imports: MASS, stats, SuperLearner, glmnet, dplyr, rlang, ggplot2, tidyr
 RoxygenNote: 7.1.2

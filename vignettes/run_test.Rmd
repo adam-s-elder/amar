@@ -80,18 +80,72 @@ ic.mean <- function(observ, what = "both", control = NULL){
 Now that we have our newly defined IC, we can pass it to the testing function.  We first create a new dataset for which we are interested in testing if each covariate has mean zero:
 
 ```{r}
-obs_data_mean1 <- matrix(rnorm(n = 5000) +
-                          rep(c(0, 0, 0, 0, 0.01), each = 1000),
+set.seed(100)
+obs_data_mean1 <- matrix(rnorm(n = 500) +
+                          rep(c(0, 0, 0, 0, 0.01), each = 100),
                         ncol = 5, byrow = FALSE)
 res_1 <- amp::mv_pn_test(obs_data_mean1, param_est = ic.mean,
                           control = amp::test.control())
 
-obs_data_mean2 <- matrix(rnorm(n = 5000) +
-                           rep(c(0, 0, 0.2, 0, 0.07), each = 1000),
+obs_data_mean2 <- matrix(rnorm(n = 500) +
+                           rep(c(0, 0, 0.32, 0, 0.07), each = 100),
                          ncol = 5, byrow = FALSE)
 res_2 <- amp::mv_pn_test(obs_data_mean2, param_est = ic.mean,
                           control = amp::test.control())
 print(c(res_1$pvalue, res_2$pvalue))
 ```
 
-In cases where control will modify the behavior of the IC or parameter estimation, these arguments should be appended to the list of already created arguments in `amp::test.control()` and passed to the `control` argument of the `mv_pn_test`.
+In cases where control will modify the behavior of the IC or parameter estimation, these arguments should be appended to the list of already created arguments in `amp::test.control()` and passed to the `control` argument of the `mv_pn_test`.  
+
+### A very minor note
+
+When passing control arguments to the `param_est` function, it is recommended that if needed, these functions explicitly pull these arguments out of control before passing them to a nested function:
+
+```{r}
+## Correct usage
+nested_fun1 <- function(x) return(x)
+ic.mean1 <- function(observ, what = "both", control = NULL){
+  if (!(what %in% c("ic", "est", "both"))) {
+    stop("what must be one of ic (influence curve), est (estimate), or both")
+  }
+  ret <- list()
+  if (what %in% c("ic", "both")) {
+    mult <- nested_fun1(control$extra_arg)
+    col_means <- mult * colMeans(x = observ)
+    infl <- sweep(x = observ, MARGIN = 2,
+                  STATS = col_means, FUN = "-")
+    ret$ic <- infl
+  }
+  if (what %in% c("est", "both")) {
+    ret$est <- colMeans(x = observ)
+  }
+  return(ret) 
+}
+
+test1 <- amp::mv_pn_test(obs_data_mean1, param_est = ic.mean1,
+                         control = c(amp::test.control(), 
+                                     "extra_arg" = 2))
+
+## Incorrect usage
+nested_fun2 <- function(x) return(x$extra_arg)
+ic.mean2 <- function(observ, what = "both", control = NULL){
+  if (!(what %in% c("ic", "est", "both"))) {
+    stop("what must be one of ic (influence curve), est (estimate), or both")
+  }
+  ret <- list()
+  if (what %in% c("ic", "both")) {
+    mult <- nested_fun2(control)
+    col_means <- mult * colMeans(x = observ)
+    infl <- sweep(x = observ, MARGIN = 2,
+                  STATS = col_means, FUN = "-")
+    ret$ic <- infl
+  }
+  if (what %in% c("est", "both")) {
+    ret$est <- colMeans(x = observ)
+  }
+  return(ret) 
+}
+test2 <- amp::mv_pn_test(obs_data_mean1, param_est = ic.mean2,
+                         control = c(amp::test.control(), 
+                                     "extra_arg" = 2))
+```

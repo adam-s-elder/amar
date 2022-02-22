@@ -6,7 +6,13 @@
 #' @export
 
 l_p_norm <- function(x, p = "max", type = "lp"){
-  if(type == "lp"){
+  if (!(type %in% c("lp", "ssq"))) {
+    stop(paste0(
+      "Currently the l_p_norm function only supports two types of norms, ",
+      "including lp and ssq.  The norm type provided was ", type, "."
+    ))
+  }
+  if (type == "lp"){
     if (p == "max") {
       return(max(abs(x)))
     } else {

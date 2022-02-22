@@ -15,6 +15,7 @@
 
 mv_pn_test <- function(obs_data, param_est = NULL,
                     control = test.control()) {
+  .checkargs(obs_data, param_est, control)
   init_est <- calc_gam_star(
     obs_data = obs_data, param_est = param_est,
     control = control, lm_dst = NULL,
@@ -54,11 +55,6 @@ mv_pn_test <- function(obs_data, param_est = NULL,
     }
   }
   p_val <- mean(as.integer(gam_star_n > ts_lim_dist))
-  if (control$show_hist) {
-    browser()
-    graphics::hist(ts_lim_dist)
-    graphics::abline(v = gam_star_n, col = "red")
-  }
   if (control$more_info) {
     chsn_tbl <- vapply(control$pos_lp_norms,
                        function(x) mean(x == init_est$chsn_norms),
@@ -80,4 +76,36 @@ mv_pn_test <- function(obs_data, param_est = NULL,
   }else{
     return(c("p-value" = p_val))
   }
+}
+
+.checkargs <- function(obs_data, param_est, control) {
+  default_control_args <- names(amp::test.control())
+  passed_controls <- names(control)
+  mis_args <- setdiff(default_control_args, passed_controls)
+  if (length(mis_args) > 0) stop(
+    paste0("Some control arguments have not been provided: ",
+           paste0("\n ", mis_args, " ", collapse = ""),
+           "\n To avoid this error, consider using amp::test.control()")
+  )
+  non_stand_args <- setdiff(passed_controls, default_control_args)
+  if (length(non_stand_args) > 0) {
+    fun_def <- deparse(param_est)
+    unused_args <- rep(TRUE, length(non_stand_args))
+    for (i in seq_len(length(unused_args))) {
+      unused_args[i] <- !any(grepl(non_stand_args, fun_def))
+    }
+    if (any(unused_args)) {
+      ua_names <- non_stand_args[unused_args]
+      warning(
+        paste0("Some arguments appear not to be used by the test.  These are: ",
+               paste0("\n ", ua_names, " ", collapse = ""),
+               "\n To avoid this warning, explicitly call these arguments ",
+               "in your param_est function (rather than just ",
+               "passing all control arguments to another function.")
+      )
+    }
+  }
+  if (!(control$ld_est_meth %in% c("par_boot", "perm"))) {
+    stop("The control argument ld_est_meth must be either 'par_boot' or 'perm'")
+    }
 }

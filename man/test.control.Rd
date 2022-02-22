@@ -5,11 +5,10 @@
 \title{Control function for the adaptive norm test}
 \usage{
 test.control(
-  n_mc_samples = 300,
+  n_peld_mc_samples = 300,
   nrm_type = "lp",
   perf_meas = "est_acc",
   pos_lp_norms = c(1, 2, 3, "max"),
-  show_hist = FALSE,
   ld_est_meth = "par_boot",
   ts_ld_bs_samp = 250,
   more_info = TRUE,
@@ -18,8 +17,9 @@ test.control(
 )
 }
 \arguments{
-\item{n_mc_samples}{Number of samples to be used in estimating the limiting
-distribution of the test statistic under the null.}
+\item{n_peld_mc_samples}{Number of samples to be used in approximating the
+estimated limiting distribution of the parameter estimate under the null.
+Increasing this value reduces the approximation error of the test statistic.}
 
 \item{nrm_type}{The type of norm to be used for the test.
 Generally the l_p norm}
@@ -28,9 +28,6 @@ Generally the l_p norm}
 
 \item{pos_lp_norms}{The index of the norms to be considered.  For example if
 we use the l_p norm, norms_indx specifies the different p's to try.}
-
-\item{show_hist}{set to True to see a histogram of the test statistic's
-limiting distribution MC draws compared to the estimated parameter.}
 
 \item{ld_est_meth}{String indicating method for estimating the limiting
 distribution of the test statistic parametric bootstrap or permutation.}

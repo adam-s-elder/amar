@@ -26,14 +26,14 @@
 #'
 #' @export
 
-ic.data.examp <- function(obs_data, what = "both", control = NULL) {
+ic.data.examp <- function (obs_data, what = "both", control = NULL) {
   y_vc <- obs_data[, "y"]
   wts <- obs_data[, "wt"]
   ws <- obs_data[, - which(colnames(obs_data) %in% c("y", "wt"))]
   est <- rep(NA, ncol(ws))
   fin_IC <- matrix(NA, nrow = length(y_vc), ncol = ncol(ws))
 
-  for (cov_idx in 1:ncol(ws)) {
+  for (cov_idx in seq_len(ncol(ws))) {
     w_j <- ws[, cov_idx]
     glm_fit <- suppressWarnings(stats::glm(y_vc ~ w_j, weights = wts,
                    family = "binomial"))
@@ -46,9 +46,9 @@ ic.data.examp <- function(obs_data, what = "both", control = NULL) {
         1 + exp(beta_0 + beta_1 * w_j)
       )
 
-    exp_w2 <- mean(expit_fracs * (w_j ** 2) * wts)
-    exp_w <- mean(expit_fracs * w_j * wts)
-    exp_1 <- mean(expit_fracs * wts)
+    exp_w2 <- mean(expit_fracs * (w_j ** 2) * wts) #I_{beta,11}
+    exp_w <- mean(expit_fracs * w_j * wts) #I_{beta,21} and I_{beta,21}
+    exp_1 <- mean(expit_fracs * wts) # I_{beta, 22}
 
     c_b <- (exp_w2 * exp_1 - (exp_w ** 2)) ** (-1)
     ic_vals <- c_b * wts * (y_vc - jst_expit) * (w_j * exp_1 - exp_w)
@@ -65,5 +65,3 @@ ic.data.examp <- function(obs_data, what = "both", control = NULL) {
 }
 
 expit <- function(x) exp(x) / (1 + exp(x))
-
-
