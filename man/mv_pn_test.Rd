@@ -19,8 +19,25 @@ influence curve.}
 \item{control}{List used to define controls for test.}
 }
 \value{
-Either a p-value, or a p-value and other information, depending on
-the value of control\$more_info.
+The test will always return the following output:
+- `pvalue`: The approximate value of the test statistic
+- `test_stat`: The approximate value of the test statistic
+- `test_st_eld`: The approximate limiting distribution of the test statistic
+ (with length equal to `ts_ld_bs_samp`).
+- `chosen_norm`: A vector indicating which norm was chosen by
+the adaptive test
+- `param_ests`: The parameter estimate.
+- `param_ses`: An estimate of the standard error of
+ each element of `param_ests`
+- `oth_ic_inf`: Any other information provided by the `param_est`
+ function when calculating the IC and parameter estimates.
+Additional information may be returned by specifying it in the
+test.control function:
+- If `"var_est"` is contained in `other_output`, the test output
+will contain will have `var_mat` returned which is the empirical
+second moment of the IC (equal asymptotically to the variance estimator).
+- If `"obs_data"` is contained in the `other_output`, the test output
+will return the data passed to the testing function.
 }
 \description{
 Runs a multivariate point null test. This function returns

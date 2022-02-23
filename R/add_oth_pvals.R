@@ -5,7 +5,6 @@
 #' corresponding standard errors.
 #'
 #' @param test_result The test result from mv_pn_test
-#' when more_info is set to TRUE.
 #'
 #' @return The same test result object with additional p-values for
 #' the Liu and Xie (2021) test (liu_xie_pvalue) and the Bonferroni based

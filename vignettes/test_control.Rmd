@@ -28,8 +28,7 @@ library(amp)
 |pos_lp_norms |The index of the norms to be considered. For example if we use the l_p norm, norms_indx specifies the different p's to try.                                                                                                                                  |
 |ld_est_meth  |String indicating method for estimating the limiting distribution of the test statistic parametric bootstrap or permutation.                                                                                                                                 |
 |ts_ld_bs_samp|The number of test statistic limiting distribution bootstrap samples to be drawn.                                                                                                                                                                            |
-|more_info    |Boolean indicating if the function should return more information that just the p-value. When true, the chosen norm index, the bonferroni based p-value, the test statistic, and the estimated distribution of the test statistic will be returned.          |
-|ret_cov_mat  |Boolean indicating if the function should also return the estimated covariance matrix. This can somewhat slow computation and result in large file sizes at higher dimensions. The argument 'more_info' must be set to 'TRUE' for this option to be possible.|
+|other_output  |A vector indicating additional data that should be returned. Currently only `"var_est"` is supported.|
 |...          |Other arguments needed in other places.                                                                                                                                                                                                                      |
 
 Throughout, we will use a simple data generating mechanism:
@@ -107,7 +106,7 @@ print(c(test_1$test_stat, test_2$test_stat))
 
 In order to better approximate the test statistic, one may increase the value of this control argument:
 
-```{r, fig.width = 8, fig.height = 8}
+```{r, fig.width = 8, fig.height = 6}
 mc_draws <- c(10, 50)
 all_res <- list()
 for (mc_draws in c(10, 50)) {
@@ -136,18 +135,20 @@ The other parameter that determines the approximation accuracy of the testing pr
 
 ## Controling the output of `mv_pn_test`
 
-The last two control arguments determine the output of the `mv_pn_test` function.  
+The last argument determines the output of the `mv_pn_test` function. The standard output of the test function is a list containing the following:
 
-### more_info
-
-The first of these arguments is `more_info`.  If this argument is takes value `FALSE`, then minimum amount of information will be shown (just the p-value).  If this argument is instead `TRUE`, then more information will be displayed, including:
-
+- `pvalue`:  The approximate p-value of the test
 - `test_stat`: The approximate value of the test statistic ($\Gamma(\hat{\psi}, \hat{P}_0)$).
-- `test_st_eld` = The approximate limiting distribution of the test statistic (with length equal to `ts_ld_bs_samp`).
-- `chosen_norm` = A vector indicating which norm was chosen by the adaptive test
+- `test_st_eld`: The approximate limiting distribution of the test statistic (with length equal to `ts_ld_bs_samp`).
+- `chosen_norm`: A vector indicating which norm was chosen by the adaptive test
 - `param_ests`: The parameter estimate ($\hat{\psi}$).
 - `param_ses`: An estimate of the standard error off each element of $\hat{\psi}$
 - `oth_ic_inf`: Any other information provided by the `param_est` function when calculating the IC and parameter estimates.
 
-The second argument, `ret_cov_mat` if set to `TRUE` (along with `more_info`) will have `var_mat` returned which is the empirical second moment of the IC (equal asymptotically to the variance estimator).  However, this matrix can be quite large for larger dimensions, which is why there is a separate control for this option.
+### other_output
+
+`other_output` is a character vector.  Currently `other_output` only provides the option of returning  two additional output elements.  
+
+- If `"var_est"` is contained in `other_output`, the test output will contain will have `var_mat` returned which is the empirical second moment of the IC (equal asymptotically to the variance estimator).  However, this matrix can be quite large for larger dimensions, which is why there is a separate control for this option.
+- If `"obs_data"` is contained in the `other_output`, the test output will return the data passed to the testing function.
 

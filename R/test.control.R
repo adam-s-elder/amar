@@ -12,14 +12,8 @@
 #' distribution of the test statistic parametric bootstrap or permutation.
 #' @param ts_ld_bs_samp The number of test statistic limiting distribution
 #' bootstrap samples to be drawn.
-#' @param more_info Boolean indicating if the function should return more
-#' information that just the p-value.  When true, the chosen norm index,
-#' the bonferroni based p-value, the test statistic,
-#' and the estimated distribution of the test statistic will be returned.
-#' @param ret_cov_mat Boolean indicating if the function should also return
-#' the estimated covariance matrix.  This can somewhat slow computation and
-#' result in large file sizes at higher dimensions. The argument `more_info`
-#' must be set to `TRUE` for this option to be possible.
+#' @param other_output A vector indicating additional data that should be
+#' returned. Currently only `"var_est"` and `data` is supported.
 #' @param ... Other arguments needed in other places.
 #'
 #' @export
@@ -31,10 +25,20 @@ test.control <- function(
   pos_lp_norms = c(1, 2, 3, "max"),
   ld_est_meth = "par_boot",
   ts_ld_bs_samp = 250,
-  more_info = TRUE,
-  ret_cov_mat = FALSE,
+  other_output = c(),
   ... ## RENAME
 ) {
+  if (length(other_output) > 0) {
+    w_n_m <-
+      which(is.na(match(other_output, c("var_est", "obs_data"))))
+    if (length(w_n_m) > 0) {
+      warning(paste0(
+        "The following output options are not supported",
+        " by other_output: \n ",
+        paste0(other_output[w_n_m], ", ", collapse = ""),
+        "\n These arguments will be ignored."))
+    }
+  }
   formal_args <- formals(sys.function())
   dot_args <- list(...)
   p <- .get.args(formal_args, dot_args)

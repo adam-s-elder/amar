@@ -8,13 +8,30 @@
 #' @param param_est Function used to estimate the parameter and corresponding
 #' influence curve.
 #' @param control List used to define controls for test.
-#' @return Either a p-value, or a p-value and other information, depending on
-#' the value of control\$more_info.
+#' @return The test will always return the following output:
+#' - `pvalue`: The approximate value of the test statistic
+#' - `test_stat`: The approximate value of the test statistic
+#' - `test_st_eld`: The approximate limiting distribution of the test statistic
+#'  (with length equal to `ts_ld_bs_samp`).
+#'- `chosen_norm`: A vector indicating which norm was chosen by
+#' the adaptive test
+#'- `param_ests`: The parameter estimate.
+#'- `param_ses`: An estimate of the standard error of
+#'  each element of `param_ests`
+#'- `oth_ic_inf`: Any other information provided by the `param_est`
+#'  function when calculating the IC and parameter estimates.
+#' Additional information may be returned by specifying it in the
+#' test.control function:
+#' - If `"var_est"` is contained in `other_output`, the test output
+#' will contain will have `var_mat` returned which is the empirical
+#' second moment of the IC (equal asymptotically to the variance estimator).
+#' - If `"obs_data"` is contained in the `other_output`, the test output
+#' will return the data passed to the testing function.
 #'
 #' @export
 
 mv_pn_test <- function(obs_data, param_est = NULL,
-                    control = test.control()) {
+                       control = test.control()) {
   .checkargs(obs_data, param_est, control)
   init_est <- calc_gam_star(
     obs_data = obs_data, param_est = param_est,
@@ -49,33 +66,30 @@ mv_pn_test <- function(obs_data, param_est = NULL,
       perm_data <- obs_data
       perm_data[, 1] <- perm_data[y_idx, 1]
       perm_est <- calc_gam_star(obs_data = perm_data, param_est = param_est,
-                            control = control, lm_dst = NULL,
-                            return_lmd = FALSE)
+                                control = control, lm_dst = NULL,
+                                return_lmd = FALSE)
       ts_lim_dist[perm_idx] <- perm_est$gam_star_n
     }
   }
   p_val <- mean(as.integer(gam_star_n > ts_lim_dist))
-  if (control$more_info) {
-    chsn_tbl <- vapply(control$pos_lp_norms,
-                       function(x) mean(x == init_est$chsn_norms),
-                       FUN.VALUE = -99)
-    if (control$ret_cov_mat) {
-      var_mat <- t(ic_est) %*% ic_est / nrow(ic_est)
-    }else{
-      var_mat <-  NULL
-    }
-    return(list("pvalue" = p_val,
-                "test_stat" = gam_star_n,
-                "test_st_eld" = ts_lim_dist,
-                "chosen_norm" = chsn_tbl,
-                "param_ests" = as.vector(init_est$param_ests),
-                "param_ses" = param_ses,
-                "var_mat" = var_mat,
-                "oth_ic_inf" = oth_ic_info
-                ))
-  }else{
-    return(c("p-value" = p_val))
+  chsn_tbl <- vapply(control$pos_lp_norms,
+                     function(x) mean(x == init_est$chsn_norms),
+                     FUN.VALUE = -99)
+  out <- list("pvalue" = p_val,
+              "test_stat" = gam_star_n,
+              "test_st_eld" = ts_lim_dist,
+              "chosen_norm" = chsn_tbl,
+              "param_ests" = as.vector(init_est$param_ests),
+              "param_ses" = param_ses,
+              "oth_ic_inf" = oth_ic_info
+  )
+  if ("var_est" %in% control$other_output) {
+    out$var_mat <- t(ic_est) %*% ic_est / nrow(ic_est)
   }
+  if ("data" %in% control$other_output) {
+    out$obs_data <- obs_data
+  }
+  return(out)
 }
 
 .checkargs <- function(obs_data, param_est, control) {

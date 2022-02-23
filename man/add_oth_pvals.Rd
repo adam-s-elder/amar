@@ -7,8 +7,7 @@
 add_oth_pvals(test_result)
 }
 \arguments{
-\item{test_result}{The test result from mv_pn_test
-when more_info is set to TRUE.}
+\item{test_result}{The test result from mv_pn_test}
 }
 \value{
 The same test result object with additional p-values for
