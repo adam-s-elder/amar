@@ -106,7 +106,7 @@ mv_pn_test <- function(obs_data, param_est = NULL,
     fun_def <- deparse(param_est)
     unused_args <- rep(TRUE, length(non_stand_args))
     for (i in seq_len(length(unused_args))) {
-      unused_args[i] <- !any(grepl(non_stand_args, fun_def))
+      unused_args[i] <- !any(grepl(non_stand_args[i], fun_def))
     }
     if (any(unused_args)) {
       ua_names <- non_stand_args[unused_args]
