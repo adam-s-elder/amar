@@ -22,12 +22,13 @@ the real data example.
 \examples{
 
 expit <- function(x) exp(x) / (1 + exp(x))
-ws <- matrix(rnorm(30000), ncol = 3)
+ws <- matrix(rnorm(3000), ncol = 3)
 probs <- expit(ws  \%*\% c(-1, 0, 2))
 y <- rbinom(n = nrow(probs), size = 1, prob = probs[, 1])
 wts <-   abs(rnorm(length(y))) + 1
 wts <- length(wts) * wts / sum(wts)
-obs_dat <- cbind(y, "wt" = wts, ws)
+cats <- rep(1:10, 100)
+obs_dat <- cbind(y, "cat" = cats, "wt" = wts, ws)
 est_ic <- ic.data.examp(obs_dat, what = "both")
 my_est <- est_ic$est
 my_ic <- est_ic$ic / nrow(ws)
