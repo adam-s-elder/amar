@@ -19,7 +19,7 @@ for each lp norm.}
 \item{norms_idx}{the index of the norms to be used (ideally integers).}
 
 \item{norm_type}{string indicating the class of norms to select over
-(sum of squares ("ssq") or lp #' norms ("lp") are currently supported).}
+(sum of squares ("ssq") or lp norms ("lp") are currently supported).}
 }
 \value{
 The estimated acceptance rate for the specified norm-based test

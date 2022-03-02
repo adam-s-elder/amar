@@ -12,7 +12,7 @@
 #' @param null_quants the cutoff values for the distribution under the null
 #' for each lp norm.
 #' @param norm_type string indicating the class of norms to select over
-#'(sum of squares ("ssq") or lp #' norms ("lp") are currently supported).
+#' (sum of squares ("ssq") or lp norms ("lp") are currently supported).
 #'
 #' @return The estimated acceptance rate for the specified norm-based test
 #' for a given local alternative.

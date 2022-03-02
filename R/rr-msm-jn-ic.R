@@ -130,7 +130,7 @@ estQcvSL.jn <- function(Y,X,SL.library=NULL, V=5, V_SL=5, family="gaussian", Del
     colnames(Q) <- c("QAW", "Q0W", "Q1W", "Q0W.Z1", "Q1W.Z1")
   }
   if(verbose){cat("\tDiscrete SL: best algorithm = ", best_alg,"\n")}
-  if (is.null(Q) | class(m_SL) == "try-error"){
+  if (is.null(Q) | inherits(m_SL, "try-error")) {
     Q <- 0
     class(Q) <- "try-error"
   }
@@ -609,9 +609,9 @@ estimateG.jn <- function (d,g1W, gform, SL.library, id, V, verbose, message, out
         }
       } else {
         form <- try(stats::as.formula(gform))
-        if(class(form)== "formula") {
+        if (inherits(form, "formula")) {
           m <- try(stats::glm(form,  data=d, family="binomial"))
-          if (class(m)[1]=="try-error"){
+          if (inherits(m, "try-error")) {
             if(verbose){cat("\tInvalid formula supplied. Running glm using main terms\n")}
             form <- paste(colnames(d)[1],"~1 + ", paste(colnames(d)[-1], collapse = "+"), sep="")
             m <- stats::glm(form, data=d, family="binomial")
