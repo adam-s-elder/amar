@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_data.R
 \name{gen_one_samp_mi}
 \alias{gen_one_samp_mi}
-\title{Generate data from a poission random variable while still obtaining the desired
+\title{Generate data from a Poisson random variable while still obtaining the desired
 xy correlation for each xy match and obtain the desired xx correlation among all
 x variables. The y and non-correlated x will be marginally
 independent.}
@@ -21,7 +21,7 @@ gen_one_samp_mi(base, xycor, xxcor, num_cor, num_uncor)
 \item{num_uncor}{Number of uncorrelated X's}
 }
 \description{
-Generate data from a poission random variable while still obtaining the desired
+Generate data from a Poisson random variable while still obtaining the desired
 xy correlation for each xy match and obtain the desired xx correlation among all
 x variables. The y and non-correlated x will be marginally
 independent.

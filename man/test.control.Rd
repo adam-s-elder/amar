@@ -23,7 +23,7 @@ Increasing this value reduces the approximation error of the test statistic.}
 \item{nrm_type}{The type of norm to be used for the test.
 Generally the l_p norm}
 
-\item{perf_meas}{the prefered measure used to generate the test statistic.}
+\item{perf_meas}{the preferred measure used to generate the test statistic.}
 
 \item{pos_lp_norms}{The index of the norms to be considered.  For example if
 we use the l_p norm, norms_indx specifies the different p's to try.}

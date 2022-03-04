@@ -72,7 +72,8 @@ laber_test <- function(obs_data, pos_lp_norms, n_peld_mc_samples, nrm_type = "lp
 #' Carry out a simplified version of the Zhang and Laber test.
 #' @param observed_data The observed data.
 #' @param ts_sims The number of draws from the test statistic distribution
-#' @param ld_sims The number of draws from the limiting distribution to estiamte each test statistic.
+#' @param ld_sims The number of draws from the limiting distribution to
+#' estimate each test statistic.
 #' @export
 
 ZL <- function(observed_data, ts_sims, ld_sims){
@@ -129,11 +130,11 @@ get_test_stat <- function(obs_data){
 }
 
 
-#' Estiamte the power using the generated test statistic, and
+#' Estimate the power using the generated test statistic, and
 #' estimated distribution of the test statistic. Helper
 #' function for ZL and ZL_use_infl
 #' @param tr_lm_dstr limiting distribution of the test statistic
-#' @param ts_vec Vector containing the test statsitic
+#' @param ts_vec Vector containing the test statistic
 #' @export
 
 est_pows <- function(tr_lm_dstr, ts_vec){
@@ -147,10 +148,10 @@ est_pows <- function(tr_lm_dstr, ts_vec){
 }
 
 
-#' Run a bonferoni based test
+#' Run a Bonferroni based test
 #' @param obs_data The observed data
 #' @param test_type Choose between using pearson correlation
-#' or the mean as the parameter or intrest
+#' or the mean as the parameter or interest
 #'
 #' @export
 
@@ -186,11 +187,11 @@ bonf_test <- function(obs_data, test_type = "pearson"){
   )
 }
 
-#' Run a Zhang and Laber test, but use influence functions to obtain estiamtes of variance
+#' Run a Zhang and Laber test, but use influence functions to obtain estimates of variance
 #' Rather than using the parametric model based variance estimates.
 #' @param observed_data The observed data.
 #' @param ts_sims The number of draws from the test statistic distribution
-#' @param ld_sims The number of draws from the limiting distribution to estiamte each test statistic.
+#' @param ld_sims The number of draws from the limiting distribution to estimate each test statistic.
 #' @export
 
 ZL_use_infl <- function(observed_data, ts_sims, ld_sims){

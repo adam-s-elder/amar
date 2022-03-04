@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_data.R
 \name{gen_pois_samp}
 \alias{gen_pois_samp}
-\title{Generate data from a poission random variable while still obtaining the desired
+\title{Generate data from a Poission random variable while still obtaining the desired
 xy correlation for each xy match and obtain the desired xx correlation among all
 x variables}
 \usage{
@@ -24,7 +24,7 @@ gen_pois_samp(ss, base, xycor, xxcor, num_cor, num_uncor, marg_indep = TRUE)
 \item{marg_indep}{Are the X-values independent from one another}
 }
 \description{
-Generate data from a poission random variable while still obtaining the desired
+Generate data from a Poission random variable while still obtaining the desired
 xy correlation for each xy match and obtain the desired xx correlation among all
 x variables
 }

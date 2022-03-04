@@ -1,13 +1,13 @@
 #' Generate a multiplier bootstrap sample
 #'
-#' @param n Number of desired observations from your bootstraped sample.
+#' @param n Number of desired observations from your bootstrapped sample.
 #' @param obs_ic The empirical estimate of the influence curve to be
 #' used in the multiplier bootstrap.
 #' @param param_est The estimated parameters which will be the mean of the
 #' multiplier bootstrap sample.
 #' @param epsilon_mat The matrix of Normal observations with independent
 #' observations from a normal with an identity Covariance matrix.
-#' @param center Boolean.  If true, the bootstraped data will be centered at
+#' @param center Boolean.  If true, the bootstrapped data will be centered at
 #' zero.  Otherwise, it will be centered at param_est.
 #' @param rate Normalizing constant. Should either be n or sqrtroot(n).
 #' @return A sample of size \code{n} generated using a multiplier bootstrap

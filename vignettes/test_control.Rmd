@@ -57,7 +57,7 @@ $$\Gamma(x, P_0) := \text{pr}(\varphi(x) < \varphi(Z)) \text{ where } Z \sim P_0
 $$\Gamma(x, P_0) := \text{pr}(\varphi(x + Z) < c_\alpha) \text{ where } Z \sim P_0 \text{ and } c_\alpha = F_{\varphi(Z)}^{-1}(1 - \alpha)$$
 
 - multiplicative distance (specified by setting `perf_meas = "mag"`): The minimum $s$ such that 
-$$\text{pr}(\varphi(sx + Z) < c_\alpha) \text{ where } Z \sim P_0 \text{ and } c_\alpha = F_{\varphi(Z)}^{-1}(1 - \alpha)$$
+$$\text{pr}(\varphi(s x + Z) < c_\alpha) \text{ where } Z \sim P_0 \text{ and } c_\alpha = F_{\varphi(Z)}^{-1}(1 - \alpha)$$
 is lower than $0.2$.
 
 **Recommendation**: Based on what we know currently, we recommend that users use the multiplicative distance performance measure. The other measures can have limiting distributions that are highly concentrated near 0 which can cause issues when approximating the p-value of the test.
@@ -133,7 +133,7 @@ hist(all_res[[2]]$test_stat, main = "MC draws = 50",
 
 The other parameter that determines the approximation accuracy of the testing procedure is `ts_ld_bs_samp`.  This argument determines the number of draws taken from the estimated limiting distribution of $\Gamma(\hat{\psi}, \hat{P}_0)$. This is different that `n_peld_mc_samples` that determines the accuracy of these draws and the test statistic.
 
-## Controling the output of `mv_pn_test`
+## Controlling the output of `mv_pn_test`
 
 The last argument determines the output of the `mv_pn_test` function. The standard output of the test function is a list containing the following:
 

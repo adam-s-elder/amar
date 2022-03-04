@@ -11,7 +11,8 @@ ZL(observed_data, ts_sims, ld_sims)
 
 \item{ts_sims}{The number of draws from the test statistic distribution}
 
-\item{ld_sims}{The number of draws from the limiting distribution to estiamte each test statistic.}
+\item{ld_sims}{The number of draws from the limiting distribution to
+estimate each test statistic.}
 }
 \description{
 Carry out a simplified version of the Zhang and Laber test.

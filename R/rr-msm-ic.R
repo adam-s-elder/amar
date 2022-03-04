@@ -13,7 +13,7 @@
 #' Obtain an estimator of the probability delta = 1 given w
 #' @param obs_data the observed data.  The first column should be the outcome.
 #' @param what the desired return value. Should be one of `"ic"`
-#' (infludence curve), `"est"` (estimate), or `"both"`.
+#' (influence curve), `"est"` (estimate), or `"both"`.
 #' @param control any other control parameters to be passed to the estimator.
 #'
 #' @export

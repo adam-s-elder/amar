@@ -16,7 +16,7 @@
 #' @param test_stat_func A function that will provide the test statistic for the
 #' given fold (using the testing data),
 #'  and uses the best norm (decided on using the training data).
-#' @param perf_meas The prefered measure to carry out evaluation of how far away the parameter
+#' @param perf_meas The preferred measure to carry out evaluation of how far away the parameter
 #' estimates are away from zero.
 #' @param null_quants The 95 percent quantiles corresponding to the limiting distribution under the
 #' various norms. The ordering of these quantiles is the same as that of the norm_indx.

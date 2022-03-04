@@ -1,5 +1,5 @@
 #' A helper function for mv_pn_test, calculating the test statistic
-#' for both the vector of parameter estiamtes, and the draws from
+#' for both the vector of parameter estimates, and the draws from
 #' the corresponding estimated limiting distribution.
 #'
 #' @param obs_data The observed data used to calculate the test statistic.

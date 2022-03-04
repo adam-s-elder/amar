@@ -16,6 +16,6 @@ test (bonf_pvalue)
 }
 \description{
 Add pvalues for the Liu and Xie and Bonferroni based
-tests using the estiamted parameter estimates and
+tests using the estimated parameter estimates and
 corresponding standard errors.
 }

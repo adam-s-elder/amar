@@ -2,7 +2,7 @@
 % Please edit documentation in R/laber_test.R
 \name{bonf_test}
 \alias{bonf_test}
-\title{Run a bonferoni based test}
+\title{Run a Bonferroni based test}
 \usage{
 bonf_test(obs_data, test_type = "pearson")
 }
@@ -10,8 +10,8 @@ bonf_test(obs_data, test_type = "pearson")
 \item{obs_data}{The observed data}
 
 \item{test_type}{Choose between using pearson correlation
-or the mean as the parameter or intrest}
+or the mean as the parameter or interest}
 }
 \description{
-Run a bonferoni based test
+Run a Bonferroni based test
 }

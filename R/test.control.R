@@ -5,7 +5,7 @@
 #' Increasing this value reduces the approximation error of the test statistic.
 #' @param nrm_type The type of norm to be used for the test.
 #' Generally the l_p norm
-#' @param perf_meas the prefered measure used to generate the test statistic.
+#' @param perf_meas the preferred measure used to generate the test statistic.
 #' @param pos_lp_norms The index of the norms to be considered.  For example if
 #' we use the l_p norm, norms_indx specifies the different p's to try.
 #' @param ld_est_meth String indicating method for estimating the limiting

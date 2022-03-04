@@ -9,9 +9,9 @@ gen_exp_cop(n, d, cov)
 \arguments{
 \item{n}{number of observations}
 
-\item{d}{number of dimentions}
+\item{d}{number of dimensions}
 
-\item{cov}{desired covaraince}
+\item{cov}{desired covariance}
 }
 \description{
 Functions for creating data

@@ -12,7 +12,7 @@ ic.proj.rr(obs_data, what = "both", control = NULL)
 \item{obs_data}{the observed data.  The first column should be the outcome.}
 
 \item{what}{the desired return value. Should be one of `"ic"`
-(infludence curve), `"est"` (estimate), or `"both"`.}
+(influence curve), `"est"` (estimate), or `"both"`.}
 
 \item{control}{any other control parameters to be passed to the estimator.}
 }

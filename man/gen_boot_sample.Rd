@@ -13,7 +13,7 @@ observations from a normal with an identity Covariance matrix.}
 \item{obs_ic}{The empirical estimate of the influence curve to be
 used in the multiplier bootstrap.}
 
-\item{center}{Boolean.  If true, the bootstraped data will be centered at
+\item{center}{Boolean.  If true, the bootstrapped data will be centered at
 zero.  Otherwise, it will be centered at param_est.}
 
 \item{param_est}{The estimated parameters which will be the mean of the
@@ -21,7 +21,7 @@ multiplier bootstrap sample.}
 
 \item{rate}{Normalizing constant. Should either be n or sqrtroot(n).}
 
-\item{n}{Number of desired observations from your bootstraped sample.}
+\item{n}{Number of desired observations from your bootstrapped sample.}
 }
 \value{
 A sample of size \code{n} generated using a multiplier bootstrap

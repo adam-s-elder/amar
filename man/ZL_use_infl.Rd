@@ -2,7 +2,7 @@
 % Please edit documentation in R/laber_test.R
 \name{ZL_use_infl}
 \alias{ZL_use_infl}
-\title{Run a Zhang and Laber test, but use influence functions to obtain estiamtes of variance
+\title{Run a Zhang and Laber test, but use influence functions to obtain estimates of variance
 Rather than using the parametric model based variance estimates.}
 \usage{
 ZL_use_infl(observed_data, ts_sims, ld_sims)
@@ -12,9 +12,9 @@ ZL_use_infl(observed_data, ts_sims, ld_sims)
 
 \item{ts_sims}{The number of draws from the test statistic distribution}
 
-\item{ld_sims}{The number of draws from the limiting distribution to estiamte each test statistic.}
+\item{ld_sims}{The number of draws from the limiting distribution to estimate each test statistic.}
 }
 \description{
-Run a Zhang and Laber test, but use influence functions to obtain estiamtes of variance
+Run a Zhang and Laber test, but use influence functions to obtain estimates of variance
 Rather than using the parametric model based variance estimates.
 }

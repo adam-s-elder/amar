@@ -1,7 +1,7 @@
 #' Functions for creating data
 #' @param n number of observations
-#' @param d number of dimentions
-#' @param cov desired covaraince
+#' @param d number of dimensions
+#' @param cov desired covariance
 #' @export
 
 gen_exp_cop <- function(n, d, cov){
@@ -24,7 +24,7 @@ gen_exp_cop <- function(n, d, cov){
 gen_norm <- function(n, d, cov) {MASS::mvrnorm(n = n, mu = rep(0, d), Sigma = cov)}
 
 
-#' Generate data from a poission random variable while still obtaining the desired
+#' Generate data from a Poisson random variable while still obtaining the desired
 #' xy correlation for each xy match and obtain the desired xx correlation among all
 #' x variables. The y and non-correlated x will be marginally
 #' independent.
@@ -56,7 +56,7 @@ gen_one_samp_mi <- function(base, xycor, xxcor, num_cor, num_uncor){
   return(c(zv, cr_x, uncr_x))
 }
 
-#' Generate data from a poission random variable while still obtaining the desired
+#' Generate data from a Poission random variable while still obtaining the desired
 #' xy correlation for each xy match and obtain the desired xx correlation among all
 #' x variables. The y and x will always be marginally dependent due to the xx correlation.
 #'
@@ -87,7 +87,7 @@ gen_one_samp_md <- function(base, xycor, xxcor, num_cor, num_uncor){
   return(c(zv, cr_x, uncr_x))
 }
 
-#' Generate data from a poission random variable while still obtaining the desired
+#' Generate data from a Poission random variable while still obtaining the desired
 #' xy correlation for each xy match and obtain the desired xx correlation among all
 #' x variables
 #'

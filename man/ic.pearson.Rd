@@ -10,7 +10,7 @@ ic.pearson(observ, what = "both", control = NULL)
 \item{observ}{the observed data.  The first column should be the outcome.}
 
 \item{what}{the desired return value. Should be one of `"ic"`
-(infludence curve), `"est"` (estimate), or `"both"`.}
+(influence curve), `"est"` (estimate), or `"both"`.}
 
 \item{control}{any other control parameters to be passed to the estimator.}
 }

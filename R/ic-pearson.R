@@ -1,5 +1,5 @@
 #' Pearson Correlation IC and estimate
-#' 
+#'
 #' This function takes a set of observations, and returns an estimate
 #' and its corresponding estimated IC matrix for the estimates of the
 #' pearson correlation. Estimates of the covariance are generated using
@@ -8,7 +8,7 @@
 #' correlation is calculated).
 #' @param observ the observed data.  The first column should be the outcome.
 #' @param what the desired return value. Should be one of `"ic"`
-#' (infludence curve), `"est"` (estimate), or `"both"`.
+#' (influence curve), `"est"` (estimate), or `"both"`.
 #' @param control any other control parameters to be passed to the estimator.
 #'
 #' @export
