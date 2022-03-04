@@ -62,7 +62,7 @@ is lower than $0.2$.
 
 **Recommendation**: Based on what we know currently, we recommend that users use the multiplicative distance performance measure. The other measures can have limiting distributions that are highly concentrated near 0 which can cause issues when approximating the p-value of the test.
 
-We will discuss specification of the norm in the next section. For more details on the procedure, including why performance measures are good for defining a test statistic, see the paper XXXXXXX.  
+We will discuss specification of the norm in the next section. For more details on the procedure, including why performance measures are good for defining a test statistic, see [A general adaptive framework for multivariate point null testing](https://arxiv.org/abs/2203.01897).  
 
 ### Norm specification
 
@@ -71,7 +71,7 @@ Two arguments are used to specify the norm used in defining the test statistic. 
 - $\ell_p$ norm (`"lp"`): $$\ell_p: (x_1, x_2, \ldots, x_d) \mapsto \sqrt[p]{\sum_{i = 1}^d|x_i|^p} $$
 - Sum of squares norm (`"ssq"`): $$\jmath_{p}:(x_1,x_2,\ldots,x_d)\mapsto \left\{\textstyle\sum_{j=1}^{p}x^2_{(d-j+1)}\right\}^{1/2}$$
 
-The choice of $p$ is specified by the `pos_lp_norms` argument. If `pos_lp_norm` is assigned a single value, a non-adaptive version of the test will be performed.  If instead `pos_lp_norm` is assigned multiple arguments an adaptive test will be carried out.  More information can be found in XXXXXX.  For the $\ell_p$ norm, it is possible to set $p = \infty$.  To make this specification in R, include `"max"` in the vector of values assigned to `pos_lp_norm`.
+The choice of $p$ is specified by the `pos_lp_norms` argument. If `pos_lp_norm` is assigned a single value, a non-adaptive version of the test will be performed.  If instead `pos_lp_norm` is assigned multiple arguments an adaptive test will be carried out.  More information can be found in [our paper](https://arxiv.org/abs/2203.01897).  For the $\ell_p$ norm, it is possible to set $p = \infty$.  To make this specification in R, include `"max"` in the vector of values assigned to `pos_lp_norm`.
 
 
 ### ld_est_meth

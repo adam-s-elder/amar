@@ -20,7 +20,7 @@ library(amp)
 
 ## Carrying out a test with a pre-built IC
 
-Here, we will go through one of the examples from the paper for which we have already built an influence curve (IC).  For a more formal introduction, see XXXXXX. In this example, $Y$ is the outcome of interest, and $X_1$,...,$X_d$ are $d$ covariates measured on each (independent) individual. The parameter in this example is the pearson correlation coefficient between the outcome of interest and each covariate, that is $\psi_i = \text{corr}(Y, X_1)$.  The null hypothesis we wish to test is that $\psi_1 = \psi_2 =$...$=\psi_d=0$. ADD NOTES SOMEWHERE ABOUT WHAT ICs ARE (AND HOW TO  FIND OUT MORE)!!!
+Here, we will go through one of the examples from the paper for which we have already built an influence curve (IC).  For a more formal introduction of influence curves, see [this article](https://arxiv.org/abs/1810.03260). In this example, $Y$ is the outcome of interest, and $X_1$,...,$X_d$ are $d$ covariates measured on each (independent) individual. The parameter in this example is the pearson correlation coefficient between the outcome of interest and each covariate, that is $\psi_i = \text{corr}(Y, X_1)$.  The null hypothesis we wish to test is that $\psi_1 = \psi_2 =$...$=\psi_d=0$.
 
 ```{r}
 x_data <- matrix(rnorm(5000), ncol = 5)
