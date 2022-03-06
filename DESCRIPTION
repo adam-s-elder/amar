@@ -17,7 +17,7 @@ Authors@R:
              role = "ths", 
              comment = c(ORCID = "0000-0002-9936-3236")))
 Description: A testing framework for testing the multivariate point null hypothesis. 
-    A testing framework described in Elder et.al. (2022) <arXiv:2203.01897> to test the multivariate point null hypothesis.  After the user selects a parameter of interest and defines the assumed data generating mechanism, this information should be encoded in functions for the parameter estimator and its corresponding influence curve. Some parameter and data generating mechanism combinations have codings in this package, and are explained in detail in the article.
+    A testing framework described in Elder et al. (2022) <arXiv:2203.01897> to test the multivariate point null hypothesis.  After the user selects a parameter of interest and defines the assumed data generating mechanism, this information should be encoded in functions for the parameter estimator and its corresponding influence curve. Some parameter and data generating mechanism combinations have codings in this package, and are explained in detail in the article.
 License: GPL (>= 3)
 Encoding: UTF-8
 BugReports: https://github.com/adam-s-elder/amp/issues

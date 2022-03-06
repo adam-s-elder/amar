@@ -1,7 +1,10 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* added cran-comments.md to the gitignore.
 ## R CMD check results
 
-There were no ERRORs, WARNINGs. The only NOTE is that this is the first package submission.
-
+There were no ERRORs, WARNINGs. There was one NOTE, that I (Adam Elder) am the package maintainer, and that "et", "al" may be misspelled in the DESCRIPTION.
 
 ## Downstream dependencies
 
