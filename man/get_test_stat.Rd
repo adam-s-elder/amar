@@ -2,13 +2,16 @@
 % Please edit documentation in R/laber_test.R
 \name{get_test_stat}
 \alias{get_test_stat}
-\title{Helper function for the Zhang and Laber tests (ZL and ZL_use_infl)}
+\title{Helper function for the Zhang and Laber test.}
 \usage{
 get_test_stat(obs_data)
 }
 \arguments{
 \item{obs_data}{The observed data}
 }
+\value{
+Returns the estimated t-statistics for the Zhang and Laber tests.
+}
 \description{
-Helper function for the Zhang and Laber tests (ZL and ZL_use_infl)
+Helper function for the Zhang and Laber test.
 }

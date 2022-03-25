@@ -2,9 +2,8 @@
 % Please edit documentation in R/laber_test.R
 \name{est_pows}
 \alias{est_pows}
-\title{Estimate the power using the generated test statistic, and
-estimated distribution of the test statistic. Helper
-function for ZL and ZL_use_infl}
+\title{A helper function to estimate the power using the generated test statistic,
+and estimated distribution of the test statistic.}
 \usage{
 est_pows(tr_lm_dstr, ts_vec)
 }
@@ -13,8 +12,11 @@ est_pows(tr_lm_dstr, ts_vec)
 
 \item{ts_vec}{Vector containing the test statistic}
 }
+\value{
+Return the estimated power of the test based for
+each of the possible sum of squares norms
+}
 \description{
-Estimate the power using the generated test statistic, and
-estimated distribution of the test statistic. Helper
-function for ZL and ZL_use_infl
+A helper function to estimate the power using the generated test statistic,
+and estimated distribution of the test statistic.
 }

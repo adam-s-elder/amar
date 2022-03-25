@@ -2,8 +2,8 @@
 % Please edit documentation in R/pval_for_mag.R
 \name{pval_for_mag}
 \alias{pval_for_mag}
-\title{Calculate the estimated p-value for a given observed alternative
-and a given norm.}
+\title{A helper function that calculates the estimated p-value for a given
+observed alternative and a given norm.}
 \usage{
 pval_for_mag(mc_limit_dstr, dir, norms_idx = 2, norm_type = "lp", ...)
 }
@@ -20,7 +20,11 @@ the limiting distribution under the null}
 \item{...}{additional arguments that may be passed to
 pval_for_mag, but which will be ignored.}
 }
+\value{
+The p-value for a test with estimate given by
+\code{dir} and limiting distribution given by \code{mc_limit_dstr}.
+}
 \description{
-Calculate the estimated p-value for a given observed alternative
-and a given norm.
+A helper function that calculates the estimated p-value for a given
+observed alternative and a given norm.
 }

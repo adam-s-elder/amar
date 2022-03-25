@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_gam_star.R
 \name{calc_gam_star}
 \alias{calc_gam_star}
-\title{A helper function for mv_pn_test, calculating the test statistic
+\title{A helper function for \code{mv_pn_test}, calculating the test statistic
 for both the vector of parameter estimates, and the draws from
 the corresponding estimated limiting distribution.}
 \usage{
@@ -28,7 +28,7 @@ limiting distribution.}
 Calculated test statistic for the given data.
 }
 \description{
-A helper function for mv_pn_test, calculating the test statistic
+A helper function for \code{mv_pn_test}, calculating the test statistic
 for both the vector of parameter estimates, and the draws from
 the corresponding estimated limiting distribution.
 }

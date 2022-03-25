@@ -1,5 +1,3 @@
-
-
 ## Influence function and parameter esitmation for the mean.
 
 est_influence_mean <- function(observ){

@@ -1,9 +1,17 @@
 #' Function for calculating the influence function used for
 #' the real data example.
 #' @param obs_data the observed data.  The first column should be the outcome.
-#' @param what the desired return value. Should be one of `"ic"`
-#' (influence curve), `"est"` (estimate), or `"both"`.
+#' @param what the desired return value. Should be one of \code{"ic"}
+#' (influence curve), \code{"est"} (estimate), or \code{"both"}.
 #' @param control any other control parameters to be passed to the estimator.
+#' @return If \code{what} is
+#'
+#' - \code{"est"}, then return the estimated parameter.
+#'
+#' - \code{"ic"}, then return the estimated IC of the parameter estimate.
+#'
+#' - \code{"both"}, then return both the parameter estimate and
+#' corresponding estimated IC.
 #'
 #' @examples
 #'
@@ -27,7 +35,7 @@
 #'
 #' @export
 
-ic.data.examp <- function (obs_data, what = "both", control = NULL) {
+ic.data.examp <- function(obs_data, what = "both", control = NULL) {
   y_vc <- obs_data[, "y"]
   wts <- obs_data[, "wt"]
   cc_cat <- obs_data[, "cat"]

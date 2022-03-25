@@ -1,8 +1,8 @@
 #' Estimate the local acceptance rate
-#' 
-#' This function is used to estimate the acceptance rate for a
-#' simple norm based test under a sequence of local alternatives
-#' in a given direction given the estimated limiting distribution.
+#'
+#' This a helper function used to estimate the acceptance rate for a
+#' simple norm based test under a sequence of local alternatives in
+#' a given direction given the estimated limiting distribution.
 #'
 #' @param mc_limit_dstr MC draws from an estimate of the
 #' (centered) limiting distribution. Data where columns correspond
@@ -16,8 +16,6 @@
 #'
 #' @return The estimated acceptance rate for the specified norm-based test
 #' for a given local alternative.
-#'
-#' @export
 
 accept_rate <- function(mc_limit_dstr, dir,
                         null_quants, norms_idx = 2,
@@ -32,7 +30,7 @@ accept_rate <- function(mc_limit_dstr, dir,
                                              decreasing = TRUE))
     }
     for (lp_idx in 1:num_norms) {
-      est_acc[lp_idx] <- mean(as.numeric(shift_distr[, norms_idx[lp_idx]] < 
+      est_acc[lp_idx] <- mean(as.numeric(shift_distr[, norms_idx[lp_idx]] <
                                             null_quants[lp_idx]))
     }
   }

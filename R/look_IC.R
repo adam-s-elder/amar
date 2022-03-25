@@ -1,16 +1,22 @@
 #' This a function used to look at the IC.
 #'
 #' @param IC an influence curve evaluated at each observation
-#' @return Histogram of the IC characteristics
+#' @return Histogram of the IC at each obeservation for each covariate.
+#' Vertical lines indicate the mean of the IC.
 #'
 #' @importFrom dplyr group_by summarise
 #' @importFrom tidyr pivot_longer
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_vline facet_wrap
 #' @importFrom rlang .data
 #'
+#' @examples
+#' set.seed(20)
+#' ic <- amp::ic.pearson(matrix(rnorm(120), ncol = 6))$ic
+#' look_IC(ic)
+#'
 #' @export
 
-look_IC <- function(IC){
+look_IC <- function(IC) {
   colnames(IC) <- 1:ncol(IC)
   tidy_ic <- tidyr::pivot_longer(
     as.data.frame(IC), cols = colnames(IC),

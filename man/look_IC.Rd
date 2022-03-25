@@ -10,8 +10,15 @@ look_IC(IC)
 \item{IC}{an influence curve evaluated at each observation}
 }
 \value{
-Histogram of the IC characteristics
+Histogram of the IC at each obeservation for each covariate.
+Vertical lines indicate the mean of the IC.
 }
 \description{
 This a function used to look at the IC.
+}
+\examples{
+set.seed(20)
+ic <- amp::ic.pearson(matrix(rnorm(120), ncol = 6))$ic
+look_IC(ic)
+
 }

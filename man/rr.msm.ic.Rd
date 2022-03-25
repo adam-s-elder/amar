@@ -16,6 +16,16 @@ rr.msm.ic(obs_data, what = "both", control = NULL)
 
 \item{control}{any other control parameters to be passed to the estimator.}
 }
+\value{
+If `what` is
+
+- `"est"`, then return the estimated parameter.
+
+- `"ic"`, then return the estimated IC of the parameter estimate.
+
+- `"both"`, then return both the parameter estimate and
+corresponding estimated IC.
+}
 \description{
 The function takes a dataset, and will returns the estimate for the
 parameter, and or the estimated influence curve at each observation.
@@ -27,4 +37,13 @@ ltmle package and is copyrighted by Joshua Schwab under the terms of
 the GPL-2 license.
 
 Obtain an estimator of the probability delta = 1 given w
+}
+\examples{
+#not run (make sure to load in SuperLearner if running)
+#set.seed(1010)
+#fake_dat <- data.frame(y = rbinom(100, size = 1, prob = 0.5),
+#                      a = rbinom(100, size =  1, prob = 0.5),
+#                       w = matrix(rnorm(500), ncol = 5))
+# rr.msm.ic(fake_dat)
+
 }

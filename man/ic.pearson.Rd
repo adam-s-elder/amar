@@ -9,10 +9,20 @@ ic.pearson(observ, what = "both", control = NULL)
 \arguments{
 \item{observ}{the observed data.  The first column should be the outcome.}
 
-\item{what}{the desired return value. Should be one of `"ic"`
-(influence curve), `"est"` (estimate), or `"both"`.}
+\item{what}{the desired return value. Should be one of \code{"ic"}
+(influence curve), \code{"est"} (estimate), or \code{"both"}.}
 
 \item{control}{any other control parameters to be passed to the estimator.}
+}
+\value{
+If \code{what} is:
+
+- \code{"est"}, then return the estimated person correlation.
+
+- \code{"ic"}, then return the estimated IC of the person correlation estimate.
+
+- \code{"both"}, then return both the estimated pearson correlation and the
+estimated IC of the person correlation estimate.
 }
 \description{
 This function takes a set of observations, and returns an estimate
@@ -21,4 +31,11 @@ pearson correlation. Estimates of the covariance are generated using
 the empirical influence function.  The first column of your data should
 correspond to the variable of interest (the variable for which pearson
 correlation is calculated).
+}
+\examples{
+dat <- matrix(rnorm(80), nrow = 20)
+ic.pearson(dat, what = "both")
+## Note that the estimate is the same as what is found using \code{cor}
+cor(dat)[1, ]
+
 }

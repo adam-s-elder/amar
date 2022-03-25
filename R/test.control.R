@@ -13,8 +13,13 @@
 #' @param ts_ld_bs_samp The number of test statistic limiting distribution
 #' bootstrap samples to be drawn.
 #' @param other_output A vector indicating additional data that should be
-#' returned. Currently only `"var_est"` and `data` is supported.
+#' returned. Currently only \code{"var_est"} and \code{data} is supported.
 #' @param ... Other arguments needed in other places.
+#' @return A list that provide controls for \code{mv_pn_test} (specified by the
+#' arguments passed to \code{test.control}).
+#'
+#' @examples
+#' test.control()
 #'
 #' @export
 

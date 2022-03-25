@@ -7,13 +7,27 @@
 #' correspond to the variable of interest (the variable for which pearson
 #' correlation is calculated).
 #' @param observ the observed data.  The first column should be the outcome.
-#' @param what the desired return value. Should be one of `"ic"`
-#' (influence curve), `"est"` (estimate), or `"both"`.
+#' @param what the desired return value. Should be one of \code{"ic"}
+#' (influence curve), \code{"est"} (estimate), or \code{"both"}.
 #' @param control any other control parameters to be passed to the estimator.
+#' @return If \code{what} is:
+#'
+#' - \code{"est"}, then return the estimated person correlation.
+#'
+#' - \code{"ic"}, then return the estimated IC of the person correlation estimate.
+#'
+#' - \code{"both"}, then return both the estimated pearson correlation and the
+#' estimated IC of the person correlation estimate.
+#'
+#' @examples
+#' dat <- matrix(rnorm(80), nrow = 20)
+#' ic.pearson(dat, what = "both")
+#' ## Note that the estimate is the same as what is found using \code{cor}
+#' cor(dat)[1, ]
 #'
 #' @export
 
-ic.pearson <- function(observ, what = "both", control = NULL){
+ic.pearson <- function(observ, what = "both", control = NULL) {
   if (!(what %in% c("ic", "est", "both"))) {
     stop("what must be one of ic (influence curve), est (estimate), or both")
   }

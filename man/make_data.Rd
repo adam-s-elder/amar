@@ -18,7 +18,19 @@ make_data(ss, dim, rho, model = 1, b = NULL)
 
 \item{b}{local alternative to be used}
 }
+\value{
+A dataframe with outcome in the first column and covariates
+in the others.  Data are generated according to the models described
+originally in McKeague and Qian (2015).
+}
 \description{
 Generate data using one of the four specified models
 from MCKEAGUE and QIAN paper
+}
+\examples{
+Sample data
+null_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 1)
+model_two_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 2)
+model_three_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 2)
+
 }

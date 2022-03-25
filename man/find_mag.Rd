@@ -2,8 +2,9 @@
 % Please edit documentation in R/find_mag.R
 \name{find_mag}
 \alias{find_mag}
-\title{Find the multiplicative distance of a specified alternative from
-the alternative in the same direction that obtains a power of 80\%.}
+\title{A helper function to find the multiplicative distance of a specified
+alternative from the alternative in the same direction that obtains
+a power of 80\%.}
 \usage{
 find_mag(one_obs, dir, cutoff, nrm_idx, nrm_type)
 }
@@ -26,6 +27,7 @@ The magnitude by which the shift must be multiplied to surpass the
 cutoff for the given observation.
 }
 \description{
-Find the multiplicative distance of a specified alternative from
-the alternative in the same direction that obtains a power of 80\%.
+A helper function to find the multiplicative distance of a specified
+alternative from the alternative in the same direction that obtains
+a power of 80\%.
 }

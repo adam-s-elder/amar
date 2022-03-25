@@ -21,34 +21,43 @@ influence curve.}
 \value{
 The test will always return the following output:
 
-- `pvalue`: The approximate value of the test statistic
+- \code{pvalue}: The approximate value of the test statistic
 
-- `test_stat`: The approximate value of the test statistic
+- \code{test_stat}: The approximate value of the test statistic
 
-- `test_st_eld`: The approximate limiting distribution of the test statistic
- (with length equal to `ts_ld_bs_samp`).
+- \code{test_st_eld}: The approximate limiting distribution of the test statistic
+ (with length equal to \code{ts_ld_bs_samp}).
 
-- `chosen_norm`: A vector indicating which norm was chosen by
+- \code{chosen_norm}: A vector indicating which norm was chosen by
 the adaptive test
 
-- `param_ests`: The parameter estimate.
+- \code{param_ests}: The parameter estimate.
 
-- `param_ses`: An estimate of the standard error of
- each element of `param_ests`
+- \code{param_ses}: An estimate of the standard error of
+ each element of \code{param_ests}
 
-- `oth_ic_inf`: Any other information provided by the `param_est`
+- \code{oth_ic_inf}: Any other information provided by the \code{param_est}
  function when calculating the IC and parameter estimates.
 Additional information may be returned by specifying it in the
 test.control function:
 
-- If `"var_est"` is contained in `other_output`, the test output
-will contain will have `var_mat` returned which is the empirical
+- If \code{"var_est"} is contained in \code{other_output}, the test output
+will contain will have \code{var_mat} returned which is the empirical
 second moment of the IC (equal asymptotically to the variance estimator).
 
-- If `"obs_data"` is contained in the `other_output`, the test output
-will return the data passed to the testing function.
+- If \code{"obs_data"} is contained in the \code{other_output}, the test
+output will return the data passed to the testing function.
 }
 \description{
 Runs a multivariate point null test. This function returns
 an approximate p-value for the specified test statistic.
+}
+\examples{
+set.seed(10)
+## NOTE: More monte-carlo samples should be taken are taken here.  This is
+only done to lower computation time.
+test <- mv_pn_test(data.frame(y = rnorm(100), x = rnorm(100)),
+                   ic.pearson, test.control(n_peld_mc_samples = 20,
+                                            ts_ld_bs_samp = 20))
+
 }

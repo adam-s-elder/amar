@@ -14,6 +14,24 @@ ZL(observed_data, ts_sims, ld_sims)
 \item{ld_sims}{The number of draws from the limiting distribution to
 estimate each test statistic.}
 }
+\value{
+A list containing:
+
+- pvalue: The p-value of the test
+
+- test_stat: The corresponding test statistic
+
+- test_st_eld: The corresponding estimated limiting distribution of
+the test statistic.
+
+- param_ests: The estimates of the measure of association (correlation)
+
+- param_ses: The corresponding standard errors of the estimates
+}
 \description{
 Carry out a simplified version of the Zhang and Laber test.
+}
+\examples{
+
+ZL(data.frame(z = rnorm(100), x1 = rnorm(100), x2 = rnorm(100)), 10, 10)
 }

@@ -1,5 +1,6 @@
-#' Find the multiplicative distance of a specified alternative from
-#' the alternative in the same direction that obtains a power of 80\%.
+#' A helper function to find the multiplicative distance of a specified
+#' alternative from the alternative in the same direction that obtains
+#' a power of 80\%.
 #'
 #' @param one_obs A single observed value from the limiting distribution.
 #' @param dir The shift by which the single observation will moved.  Generally

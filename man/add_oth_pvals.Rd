@@ -19,3 +19,13 @@ Add pvalues for the Liu and Xie and Bonferroni based
 tests using the estimated parameter estimates and
 corresponding standard errors.
 }
+\examples{
+## NOTE: More monte-carlo samples should be taken are taken here.  This is
+only done to lower computation time.
+set.seed(10)
+test <- mv_pn_test(data.frame(y = rnorm(100), x = rnorm(100)),
+                   ic.pearson, test.control(n_peld_mc_samples = 20,
+                                            ts_ld_bs_samp = 20))
+test_with_extra <- add_oth_pvals(test)
+test_with_extra[c("pvalue", "liu_xie_pvalue", "bonf_pvalue")]
+}

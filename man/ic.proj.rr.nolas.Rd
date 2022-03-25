@@ -11,13 +11,31 @@ ic.proj.rr.nolas(obs_data, what = "both", control = NULL)
 \arguments{
 \item{obs_data}{the observed data.  The first column should be the outcome.}
 
-\item{what}{the desired return value. Should be one of `"ic"`
-(influence curve), `"est"` (estimate), or `"both"`.}
+\item{what}{the desired return value. Should be one of \code{"ic"}
+(influence curve), \code{"est"} (estimate), or \code{"both"}.}
 
 \item{control}{any other control parameters to be passed to the estimator.}
+}
+\value{
+If \code{what} is
+
+- \code{"est"}, then return the estimated parameter.
+
+- \code{"ic"}, then return the estimated IC of the parameter estimate.
+
+- \code{"both"}, then return both the parameter estimate and
+corresponding estimated IC.
 }
 \description{
 Estimate both the parameter, and or the influence
 curves used for estimating the projected risk ratio (not using lasso).
 The first column of your data should correspond to the variable of interest.
+}
+\examples{
+set.seed(1010)
+fake_dat <- data.frame(y = rbinom(100, size = 1, prob = 0.5),
+                       delta = rbinom(100, size =  1, prob = 0.5),
+                       w = matrix(rnorm(500), ncol = 5))
+ic.proj.rr.nolas(fake_dat)
+
 }

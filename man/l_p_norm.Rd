@@ -11,8 +11,25 @@ l_p_norm(x, p = "max", type = "lp")
 
 \item{p}{index of the norm}
 
-\item{type}{Kind of norm used}
+\item{type}{Kind of norm used (currently only lp and
+sum of squares norms are supported)}
+}
+\value{
+The norm of x, of type \code{type} of index p.  For example,
+the euclidean norm x has \code{p = 2, type = "lp"}
 }
 \description{
 A function used to calculate various L_p norms
+}
+\examples{
+x <- c(3, 4)
+l_p_norm(x, p = 2, type = "lp")
+l_p_norm(x, p = 2, type = "ssq")
+l_p_norm(x, p = "max", type = "lp")
+l_p_norm(x, p = 1, type = "ssq")
+
+y <- c(3, 4, 5, 6)
+l_p_norm(y, p = 4, type = "lp")
+l_p_norm(y, p = 3, type = "ssq")
+
 }

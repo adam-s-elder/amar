@@ -119,7 +119,7 @@ for (mc_draws in c(10, 50)) {
   all_res[[as.character(mc_draws)]] <- 
     data.frame("mc_draws" = mc_draws, test_stat)
 }
-par(mfrow = c(1,2))
+oldpar <- par(mfrow = c(1,2))
 yl <- 25 
 hist(all_res[[1]]$test_stat, main = "MC draws = 10",
      xlab = "Test Statistic", xlim = c(0, 1), ylim = c(0, yl), 
@@ -127,6 +127,7 @@ hist(all_res[[1]]$test_stat, main = "MC draws = 10",
 hist(all_res[[2]]$test_stat, main = "MC draws = 50",
      xlab = "Test Statistic", xlim = c(0, 1),  ylim = c(0, yl), 
      breaks = seq(0, 1, 0.1))
+par(oldpar)
 ```
 
 ### ts_ld_bs_samp

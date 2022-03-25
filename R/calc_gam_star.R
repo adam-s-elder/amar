@@ -1,4 +1,4 @@
-#' A helper function for mv_pn_test, calculating the test statistic
+#' A helper function for \code{mv_pn_test}, calculating the test statistic
 #' for both the vector of parameter estimates, and the draws from
 #' the corresponding estimated limiting distribution.
 #'

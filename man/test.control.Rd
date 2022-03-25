@@ -35,10 +35,18 @@ distribution of the test statistic parametric bootstrap or permutation.}
 bootstrap samples to be drawn.}
 
 \item{other_output}{A vector indicating additional data that should be
-returned. Currently only `"var_est"` and `data` is supported.}
+returned. Currently only \code{"var_est"} and \code{data} is supported.}
 
 \item{...}{Other arguments needed in other places.}
 }
+\value{
+A list that provide controls for \code{mv_pn_test} (specified by the
+arguments passed to \code{test.control}).
+}
 \description{
 Control function for the adaptive norm test
+}
+\examples{
+test.control()
+
 }

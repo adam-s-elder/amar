@@ -26,7 +26,7 @@ The estimated acceptance rate for the specified norm-based test
 for a given local alternative.
 }
 \description{
-This function is used to estimate the acceptance rate for a
-simple norm based test under a sequence of local alternatives
-in a given direction given the estimated limiting distribution.
+This a helper function used to estimate the acceptance rate for a
+simple norm based test under a sequence of local alternatives in
+a given direction given the estimated limiting distribution.
 }
