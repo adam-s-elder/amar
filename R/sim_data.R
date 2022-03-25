@@ -9,7 +9,7 @@
 #' in the others.  Data are generated according to the models described
 #' originally in McKeague and Qian (2015).
 #' @examples
-#' Sample data
+#' # Sample data
 #' null_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 1)
 #' model_two_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 2)
 #' model_three_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 2)

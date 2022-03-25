@@ -28,7 +28,7 @@ Generate data using one of the four specified models
 from MCKEAGUE and QIAN paper
 }
 \examples{
-Sample data
+# Sample data
 null_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 1)
 model_two_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 2)
 model_three_dat <- make_data(ss = 100, dim = 10, rho = 0, model = 2)

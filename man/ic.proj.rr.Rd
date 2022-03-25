@@ -32,11 +32,12 @@ curves used for estimating the projected risk ratio. The first column
 of your data should correspond to the variable of interest.
 }
 \examples{
-set.seed(1010)
-fake_dat <- data.frame(y = rbinom(100, size = 1, prob = 0.5),
-                       delta = rbinom(100, size =  1, prob = 0.5),
-                       w = matrix(rnorm(500), ncol = 5))
-ic.proj.rr(fake_dat)
+# not run (make sure to load in SuperLearner if running)
+# set.seed(1010)
+# fake_dat <- data.frame(y = rbinom(100, size = 1, prob = 0.5),
+#                       delta = rbinom(100, size =  1, prob = 0.5),
+#                      w = matrix(rnorm(500), ncol = 5))
+# ic.proj.rr.nolas(fake_dat)
 
 
 }

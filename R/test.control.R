@@ -53,9 +53,9 @@ test.control <- function(
                   "'pval', 'mag', or 'est_acc' if it is a string."))
     }
     p$perf_meas <- list(
-      "est_acc" = amp::accept_rate,
-      "pval" = amp::pval_for_mag,
-      "mag" = amp::mag_for_pow
+      "est_acc" = accept_rate,
+      "pval" = pval_for_mag,
+      "mag" = mag_for_pow
     )[[p$perf_meas]]
   }
   return(p)

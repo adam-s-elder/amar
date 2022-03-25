@@ -21,7 +21,7 @@ corresponding standard errors.
 }
 \examples{
 ## NOTE: More monte-carlo samples should be taken are taken here.  This is
-only done to lower computation time.
+## only done to lower computation time.
 set.seed(10)
 test <- mv_pn_test(data.frame(y = rnorm(100), x = rnorm(100)),
                    ic.pearson, test.control(n_peld_mc_samples = 20,
