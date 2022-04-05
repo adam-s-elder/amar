@@ -1,7 +1,9 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* added cran-comments.md to the gitignore.
+* added \examples of nearly all functions
+* add \value to .Rd files regarding exported methods
+* adjusted code reset user's options()
 ## R CMD check results
 
 There were no ERRORs, WARNINGs. There was one NOTE, that I (Adam Elder) am the package maintainer, and that "et", "al" may be misspelled in the DESCRIPTION.
