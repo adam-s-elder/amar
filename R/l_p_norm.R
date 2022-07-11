@@ -5,6 +5,7 @@
 #' sum of squares norms are supported)
 #' @return The norm of x, of type \code{type} of index p.  For example,
 #' the euclidean norm x has \code{p = 2, type = "lp"}
+#' @importFrom stats dgeom
 #'
 #' @examples
 #' x <- c(3, 4)
@@ -20,10 +21,10 @@
 #' @export
 
 l_p_norm <- function(x, p = "max", type = "lp"){
-  if (!(type %in% c("lp", "ssq"))) {
+  if (!(type %in% c("lp", "ssq", "l2w"))) {
     stop(paste0(
-      "Currently the l_p_norm function only supports two types of norms, ",
-      "including lp and ssq.  The norm type provided was ", type, "."
+      "Currently the l_p_norm function only supports three types of norms, ",
+      "including lp, l2w, and ssq.  The norm type provided was ", type, "."
     ))
   }
   if (type == "lp"){
@@ -38,5 +39,9 @@ l_p_norm <- function(x, p = "max", type = "lp"){
     x2 <- x ** 2
     some_x <- sort(x2, decreasing = TRUE)
     return(sqrt(sum(some_x[1:p])))
+  }else if (type == "l2w") {
+    weights <- stats::dgeom(0:(length(x) - 1), prob = p)
+    x2 <- (weights / mean(weights)) * x ** 2
+    return(sqrt(sum(x2)))
   }
 }

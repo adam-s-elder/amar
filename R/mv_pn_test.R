@@ -36,6 +36,7 @@
 #'
 #' - If \code{"obs_data"} is contained in the \code{other_output}, the test
 #' output will return the data passed to the testing function.
+#' @import nlshrinkadam
 #'
 #' @export
 #'

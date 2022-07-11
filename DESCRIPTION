@@ -1,7 +1,7 @@
 Package: amp
 Type: Package
 Title: Statistical Test for the Multivariate Point Null Hypotheses
-Version: 1.0.0
+Version: 1.0.1
 Authors@R:
     c(person(given = "Adam",
              family = "Elder",
@@ -22,7 +22,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 BugReports: https://github.com/adam-s-elder/amp/issues
 LazyData: true
-Imports: MASS, stats, SuperLearner, glmnet, dplyr, rlang, ggplot2, tidyr
+Imports: MASS, stats, SuperLearner, glmnet, dplyr, rlang, ggplot2, tidyr, nlshrinkadam
 RoxygenNote: 7.1.2
 Suggests: 
     rmarkdown,

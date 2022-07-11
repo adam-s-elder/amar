@@ -34,10 +34,10 @@ accept_rate <- function(mc_limit_dstr, dir,
                                             null_quants[lp_idx]))
     }
   }
-  if (norm_type == "lp") {
+  if (norm_type %in% c("l2w", "lp")) {
     for (lp_idx in 1:num_norms) {
       norm_shift_distr <- apply(shift_distr, 1, l_p_norm,
-                                p = norms_idx[lp_idx], type = "lp")
+                                p = norms_idx[lp_idx], type = norm_type)
       est_acc[lp_idx] <- mean(as.numeric(norm_shift_distr <
                                            null_quants[lp_idx]))
     }

@@ -33,10 +33,11 @@ pval_for_mag <- function(mc_limit_dstr, dir, norms_idx = 2,
     }
     return(est_pvals)
   }
-  if (norm_type == "lp") {
-    nrmd_distr <- apply(mc_limit_dstr, 1, l_p_norm, p = norms_idx[lp_idx], type = "lp")
+  if (norm_type %in% c("l2w", "lp")) {
+    nrmd_distr <- apply(mc_limit_dstr, 1, l_p_norm,
+                        p = norms_idx[lp_idx], type = norm_type)
     for (lp_idx in 1:num_norms) {
-      trans_dir <- l_p_norm(dir, p = norms_idx[lp_idx], type = "lp")
+      trans_dir <- l_p_norm(dir, p = norms_idx[lp_idx], type = norm_type)
       est_pvals[lp_idx] <- mean(as.numeric(nrmd_distr >= trans_dir))
     }
     names(est_pvals) <- norms_idx

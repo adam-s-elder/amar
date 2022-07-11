@@ -3,3 +3,5 @@
 .RData
 .Rproj.user
 inst/doc
+inst/old_amp_funs.R
+R/shrink_ic.R

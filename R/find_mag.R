@@ -12,6 +12,7 @@
 #' @param nrm_type specifies the type of norm to be used.
 #' @return The magnitude by which the shift must be multiplied to surpass the
 #' cutoff for the given observation.
+#' @importFrom stats dgeom
 #'
 #' @export
 
@@ -26,6 +27,26 @@ find_mag <- function(one_obs, dir, cutoff, nrm_idx, nrm_type) {
     for (k_idx in 0:lp) {
       poly[k_idx + 1] <- choose(lp, k_idx) *
         sum(dir_mat[k_idx + 1, ] * (one_obs ** (lp - k_idx)))
+    }
+    poly[1] <- poly[1] - cutoff ** lp
+    all_rts <- polyroot(poly)
+    pos_root <- which(Re(all_rts) > 0)
+    apr <- all_rts[pos_root]
+    real_root <- which(abs(Im(apr)) < 0.00001)
+    if (length(real_root) != 1) return(-1) else return(Re(apr[real_root]))
+  } else if (nrm_type == "l2w") {
+    lp <- 2
+    n_covs <- length(one_obs)
+    weights <- stats::dgeom(0:(n_covs - 1), prob = nrm_idx)
+    weights <- weights / mean(weights)
+    poly <- rep(NA, lp + 1)
+    dir_mat <- matrix(NA, nrow = lp + 1, ncol = n_covs)
+    dir_mat[1, ] <- rep(1, n_covs)
+    for (i in 2:(lp + 1)) dir_mat[i, ] <- dir_mat[i - 1, ] * dir
+    for (k_idx in 0:lp) {
+      poly[k_idx + 1] <- choose(lp, k_idx) *
+        sum(weights * dir_mat[k_idx + 1, ] *
+              (one_obs ** (lp - k_idx)))
     }
     poly[1] <- poly[1] - cutoff ** lp
     all_rts <- polyroot(poly)

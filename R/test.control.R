@@ -12,6 +12,8 @@
 #' distribution of the test statistic parametric bootstrap or permutation.
 #' @param ts_ld_bs_samp The number of test statistic limiting distribution
 #' bootstrap samples to be drawn.
+#' @param shrink_cov A logical of whether to use a shrinkage
+#' covariance estimator.
 #' @param other_output A vector indicating additional data that should be
 #' returned. Currently only \code{"var_est"} and \code{data} is supported.
 #' @param ... Other arguments needed in other places.
@@ -30,6 +32,7 @@ test.control <- function(
   pos_lp_norms = c(1, 2, 3, "max"),
   ld_est_meth = "par_boot",
   ts_ld_bs_samp = 250,
+  shrink_cov = TRUE,
   other_output = c(),
   ... ## RENAME
 ) {
