@@ -13,6 +13,7 @@
 #' @param return_lmd Boolean for whether to return the estimated
 #' limiting distribution.
 #' @return Calculated test statistic for the given data.
+#' @importFrom expm sqrtm
 #'
 #' @export
 
@@ -24,7 +25,34 @@ calc_gam_star <- function(obs_data, param_est, control,
   }else{
     est_and_ic <- param_est(obs_data, what = "both", control = control)
     ic_est <- est_and_ic$ic
-    psi_est <- est_and_ic$est
+    # if (control$shrink_cov) { #Experimental; using a shrinkage estimator for IC:
+    #   old_ic <- ic_est
+    #   invisible(capture.output(
+    #     ic_est <- nlshrinkadam::nlshrink_cov(ic_est, ret_ic = TRUE)
+    #   ))
+    #   ## The following line is added to make sure the new covariance estimate
+    #   ## is scaled the same as the old IC.
+    #   ic_est <- ic_est * sqrt(nrow(ic_est))
+    # }
+    if (control$standardize) {
+        vcov_mat <- t(ic_est) %*% ic_est / nrow(obs_data)
+        # print(vcov_mat)
+        if (nrow(obs_data) < nrow(vcov_mat)) {
+          stop("Support for standardization when p > n has not been added")
+          # s_mat <- MASS::ginv(vcov_mat)
+        }else{
+          s_mat <- solve(vcov_mat)
+        }
+        # print(s_mat)
+        sqrt_mat <- Re(expm::sqrtm(s_mat))
+        psi_est <- sqrt_mat %*% as.vector(est_and_ic$est)
+        ic_est <- diag(length(psi_est)) * sqrt(nrow(ic_est))
+        zero_mat <- matrix(0, nrow = nrow(obs_data) - nrow(ic_est),
+                           ncol = ncol(ic_est))
+        ic_est <- rbind(ic_est, zero_mat)
+      } else {
+        psi_est <- est_and_ic$est
+    }
     n_peld_mc_samples <- control$n_peld_mc_samples
     norm_mat  <- matrix(
       stats::rnorm(n_peld_mc_samples * nrow(ic_est)), nrow = n_peld_mc_samples
@@ -55,8 +83,14 @@ calc_gam_star <- function(obs_data, param_est, control,
     param_ses <- apply(
       ic_est, 2, FUN = function(x) sqrt(mean((x - mean(x)) ** 2) / length(x))
       )
+    # if (control$shrink_cov) {
+    #   param_ses <-  apply(
+    #     ic_est, 2, FUN = function(x) sqrt(mean((x) ** 2) / length(x))
+    #   )
+    # }
     if (exists("est_and_ic")) {
       oth_ic_inf <- est_and_ic[setdiff(names(est_and_ic), c("est", "ic"))]
+      # oth_ic_inf$old_ic <- old_ic
     }else{
       oth_ic_inf <- NULL
     }
